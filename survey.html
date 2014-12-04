@@ -1,0 +1,47 @@
+{% extends "./wrapper.html" %}{% load actionkit_tags %}
+
+{% block content %}
+<!-- @START survey.html -->
+
+<div class="medium-24 columns page-title">
+     <h2>{{ page.title }}</h2>
+</div>
+
+<form class="ak-form" name="act" method="POST" action="/act/" accept-charset="utf-8">
+     <input type="hidden" name="page" value="{{ page.name }}">
+     <input type="hidden" name="required" value="country">
+
+     <div class="medium-9 medium-push-14 columns right-column">
+          <div class="form-pretext">
+               {% if page.custom_fields.custom_form_title %}{{ page.custom_fields.custom_form_title }}{% else %}Take Our Survey!{% endif %}
+          </div>
+
+          {% include "./user_form_wrapper.html" %}
+
+          <div id="survey-questions" class="survey-questions">
+               {% autoescape off %}
+                    {% for question in form.surveyquestion_set.all %}
+                         <div>
+                              <label>{{ question.question_label }}</label>
+                              {{ question.question_html }}
+                         </div>
+                    {% endfor %}
+               {% endautoescape %}
+          </div> <!-- .survey-questions -->
+
+          <div class="submit-button">
+               <button type="submit">{% if page.custom_fields.submit_button_text %}{{ page.custom_fields.submit_button_text }}{% else %}Submit{% endif %}</button>         
+          </div> <!-- .submit-button -->
+
+          {% include "./progress_meter.html" %}
+     </div> <!-- .right-column -->
+
+     <div class="medium-13 medium-offset-1 medium-pull-9 columns about-text">
+          {% autoescape off %}
+               <div>{% include_tmpl form.introduction_text %}</div>
+          {% endautoescape %} 
+     </div> <!-- .about-text -->
+</form>
+
+<!-- @END survey.html -->
+{% endblock %}

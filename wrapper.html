@@ -1,0 +1,229 @@
+{% load actionkit_tags %}
+<!DOCTYPE html>
+<!-- Foundation Template -->
+<!-- @START wrapper.html -->
+<html class="no-js ak-no-js" lang="{{page.lang.iso_code|default:"en"}}"{% if page.lang.is_rtl %} dir="rtl"{% endif %}>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<title>
+		{% block title %}
+			{{ page.title }} | {% filter ak_text:"org_name" %}{% client_name %}{% endfilter %}
+		{% endblock %}
+	</title>
+
+	<link rel="shortcut icon" href="https://s3.amazonaws.com/s3.alaskawild.org/images/favicon.ico" />
+
+	<!-- Custom CSS -->
+	<link rel="stylesheet" href="https://s3.amazonaws.com/s3.alaskawild.org/foundation/css/app.css" />
+
+	<script>startTime=new Date()</script>
+
+	{% if form.id %}
+		<meta name="description" property="og:description" content="{% block description %}{{ page.custom_fields.description|default:form.intro|striptags }}{% endblock %}">
+	{% endif %}
+
+	{% if page.custom_fields.image %}
+		<meta property="og:image" content="{{ page.custom_fields.image }}">
+	{% endif %}
+
+	{% block meta_additions %}{% endblock %}
+
+	{% block css_additions %}{% endblock %}
+
+	{% load_ak_context context %}
+
+	<!-- jQuery from Google CDN -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>       
+
+	<!-- Mondernizr -->
+	<script src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/js/modernizr.js"></script>
+
+	<!-- Jquery Expander Plugin -->
+	<script src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/js/jquery.expander.min.js"></script>
+
+	{% load_js %}
+		/resources/actionkit.js
+	{% end %}
+
+	<!-- Share Progress -->
+	<script src="//c.shpg.org/44/sp.js"></script>
+
+	{% block script_additions %}{% endblock %}
+</head>
+
+<body class="{{ filename|split:'.'|nth:0 }}-page lang-{{page.lang.iso_code|default:"unknown"}}{% if page.lang.is_rtl %} ak-rtl{% endif %} ak-no-js">
+	<script type="text/javascript">actionkit.forms.initPage()</script>
+
+	<div class="container">
+		{% if page.custom_fields.donation_template_2 or page.custom_fields.donation_template_3 or page.custom_fields.donation_template_4 or page.custom_fields.splash_page %}
+			<div class="header-wrapper">
+				<div class="header alternate-layout">
+					<div class="row">
+						<div class="medium-24 columns">
+							<ul class="links">
+								<li><a href="http://www.alaskawild.org/ways-to-give/">Ways to Give</a></li>
+							</ul> <!-- .links -->
+						</div>
+
+						<div class="medium-5 columns logo alternate-layout">
+							<h1>
+								<a href="http://www.alaskawild.org">
+									<img src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/img/small-logo-shadow.png" title="{% client_name %}">
+								</a>
+							</h1>
+						</div> <!-- .logo -->
+					</div> <!-- .row -->
+				</div> <!-- .header -->
+			</div> <!-- .header-wrapper -->
+		{% else %}
+			<div class="header-wrapper">
+				<div class="header">
+					<div class="row">
+						<div class="medium-24 columns">
+							<div class="hide-for-small top-links">
+								<ul class="links">
+									<li><a href="http://www.alaskawild.org/blog" target="_blank">blog</a></li>
+									<li><a href="http://www.alaskawild.org/news" target="_blank">news</a></li>
+									<li><a href="https://act.alaskawild.org/donate/our_store/" target="_blank">shop</a></li>
+									<li class="sign-up"><a href="http://act.alaskawild.org/signup/website_signup_top/">sign up</a></li>
+									<li class="donate"><a href="https://act.alaskawild.org/donate/main/">donate</a></li>
+								</ul> <!-- .links -->
+
+								<div class="socmed">
+									<a href="http://www.facebook.com/KeepAlaskaWild" class="fb" target="_blank"></a>
+									<a href="https://twitter.com/alaskawild" class="tw" target="_blank"></a>
+								</div> <!-- .socmed -->
+
+								<div class="clear"></div>
+							</div> <!-- .top-links -->
+
+							<div class="logo">
+								<h1>
+									<a href="http://www.alaskawild.org">
+										<span class="hidden">Alaska Wilderness League</span>
+
+										{% if page.type = "Donation" %}
+											<img class="donation-logo" src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/img/small-logo-shadow.png" title="{% client_name %}">
+										{% else %}
+											<img src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/img/logo-shadow.png" title="{% client_name %}">
+										{% endif %}
+									</a>
+								</h1>
+							</div> <!-- .logo -->
+						</div> <!-- .medium-24 -->
+					</div> <!-- .row -->
+				</div> <!-- .header -->
+
+				<!-- Starting Top Bar -->
+				<div class="row">
+					<div id="nav" class="medium-24 columns">
+						<div class="mobile-logo show-for-small">
+							<h1>
+								<a href="http://www.alaskawild.org">
+									<img src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/img/small-logo.png" title="{% client_name %}">
+								</a>
+							</h1>
+						</div> <!-- .mobile-logo -->
+
+						<nav class="top-bar" data-topbar>
+							<ul class="title-area">
+								<li class="name hide-for-small">
+									<h1>
+										<a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
+											<?php bloginfo( 'name' ); ?>
+										</a>
+									</h1>
+								</li>
+
+								<li class="name show-for-small"></li>
+
+								<li class="top-buttons">
+									<a href="https://act.alaskawild.org/donate/main/">Donate!</a>
+								</li>
+
+								<!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+								<li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+							</ul>
+
+							<section class="top-bar-section">
+								<!-- Right Nav Section -->
+								<ul class="right">
+									<li><a href="http://alaskawild.org/who-we-are/"><span class="first">Who</span>We Are</a></li>
+									<li><a href="http://alaskawild.org/places-we-protect/"><span class="first">Places</span>we Protect</a></li>
+									<li><a href="http://alaskawild.org/what-we-do/"><span class="first">How</span>We Do It</a></li>
+									<li{% if page.type == "Donation" %}{% else %} class="active"{% endif %}><a href="http://alaskawild.org/get-involved/action-center"><span class="first">Get</span>Involved</a>{% if page.type == "Donation" %}{% else %}<div class="bottom-triangle"><div></div></div>{% endif %}</li>
+									<li{% if page.type == "Donation" %} class="active"{% else %}{% endif %}><a href="http://alaskawild.org/ways-to-give/"><span class="first">Ways</span>to Give</a>{% if page.type == "Donation" %}<div class="bottom-triangle"><div></div></div>{% else %}{% endif %}</li>
+								</ul>
+							</section>
+						</nav> <!-- .top-bar --> 
+					</div> <!-- medium-24 -->
+				</div> <!-- .row -->
+			</div> <!-- .header-wrapper -->
+		{% endif %}
+
+		<div class="body-wrapper">
+			<div class="row body">
+				{% block content %}{% endblock %}
+			</div>
+		</div> <!-- .body -->
+
+		{% if page.custom_fields.splash_page %}
+		{% else %}
+			<div class="row footer">
+				<div class="medium-24 columns">
+					<span>{% filter ak_text:"org_name" %}{% client_name %}{% endfilter %}<br></span>
+					<span><a href="http://www.alaskawild.org/privacy-policy">{{ 'Privacy'|ak_text:'privacy' }}</a></span>&nbsp;|&nbsp;
+					<span><a href="mailto:info@alaskawild.org">{{ 'Contact'|ak_text:'contact' }}</a></span>
+				</div> <!-- .medium-24 -->
+			</div> <!-- .footer -->
+		{% endif %}
+
+		{% block below_form %}
+			<script type="text/javascript">
+				actionkit.forms.contextRoot = '/context/';
+				actionkit.forms.initForm('act');
+			</script>
+		{% endblock %}
+
+		{% if analytics_key %}
+			<script type="text/javascript">
+				var _gaq = _gaq || [];
+				_gaq.push(['_setAccount', '{{ analytics_key }}']);
+				_gaq.push(['_trackPageview']);
+
+				(function() {
+					var ga = document.createElement('script'); ga.type = 'text/javascript';
+					ga.async = true;
+					ga.src = ('https:' == document.location.protocol ? 'https://ssl' :
+						'http://www') + '.google-analytics.com/ga.js';
+					var s = document.getElementsByTagName('script')[0];
+					s.parentNode.insertBefore(ga, s);
+				})();
+			</script>
+		{% endif %}
+	</div> <!-- .container -->
+
+	<!-- Foundation JS -->
+	<script src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/js/foundation.min.js"></script>
+
+	<script>
+		$(document).foundation();
+	</script>
+
+	{% if page.custom_fields.splash_page %}
+		<style>
+			body {
+				background: url({{ page.custom_fields.splash_page }}) no-repeat center center fixed;
+				-webkit-background-size: cover;
+				-moz-background-size: cover;
+				-o-background-size: cover;
+				background-size: cover;
+			}
+		</style>
+	{% endif %}
+</body>
+<!-- @END wrapper.html -->
+</html>

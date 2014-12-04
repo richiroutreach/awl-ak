@@ -1,0 +1,76 @@
+{% extends "./wrapper.html" %}{% load actionkit_tags %}
+{% block content %}
+<!-- @START call.html -->
+<div class="medium-24 columns page-title">
+	<h2>{{ page.title }}</h2>
+</div> <!-- page.title -->
+
+
+<form class="ak-form" name="act" method="POST" action="/act/" accept-charset="utf-8">
+	<div class="medium-9 medium-push-14 columns right-column">
+		<div class="form-pretext">
+			{% if page.custom_fields.custom_form_title %}
+				{{ page.custom_fields.custom_form_title }}
+			{% else %}
+			{% endif %}
+          </div>
+
+		<div id="need_contact_info"></div>
+
+		<script type="text/ak-template" for="need_contact_info">
+			[% if (incomplete) { %]
+				<div>{% filter ak_text:"call_needs_contact_info" %}Fill out the form below so we can find the number for you to call.{% endfilter %}</div>
+			[% } %]
+		</script>
+
+		{% include "./user_form_wrapper.html" %}
+
+		<div id="what_to_say"></div>
+		
+		<script type="text/ak-template" for="what_to_say">
+			[% if (!incomplete) { %]
+				<div id="script_intro">Call and say:</div>
+				
+				{% include_tmpl form.script_text %}
+			[% } %]
+		</script>
+
+		{% include "./progress_meter.html" %}
+
+		<div id="who_called"></div>
+		
+		<script type="text/ak-template" for="who_called">
+			[% if (!incomplete) { %]
+				<br>
+				<div>Who did you call?</div>
+			[% } %]
+		</script>
+
+		<div id="target_checkboxes"></div>
+
+		<div class="ak-labels-overlaid" id="ak-survey_question"></div>
+		
+		{% if form.survey_question_text %}
+			<script type="text/ak-template" for="ak-survey_question">
+				[% if (!incomplete) { %]
+					{% autoescape off %}
+						<label for="id_action_survey">{% include_tmpl form.survey_question_text %}</label>
+					{% endautoescape %}
+					<textarea id="id_action_survey" name="action_survey"></textarea>
+				[% } %]
+			</script>
+		{% endif %}
+
+		<input type="hidden" name="page" value="{{ page.name }}">
+
+		<div style="clear: both;"></div>
+		<button type="submit">Submit</button>
+	</div> <!-- .right-column -->
+
+	<div class="medium-13 medium-offset-1 medium-pull-9 columns left-column about-text">
+		{% autoescape off %}
+			{% include_tmpl form.introduction_text %}
+		{% endautoescape %}
+	</div> <!-- .left-column -->
+</form>
+{% endblock %}
