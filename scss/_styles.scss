@@ -1355,3 +1355,48 @@ ul#ak-errors {
 		}
 	}
 }
+
+@media #{$small-only} {
+	.splash-layout {
+		input[type="submit"] {
+			margin-top: 1rem;
+		}
+
+		.user-form, .payment-form {
+			select {
+				margin-bottom: 1rem;
+				padding-top: 7px;
+			}
+		}
+
+		.page-title {
+			h2 {
+				font-size: 1.5rem;
+			}
+		}
+
+		.row.amounts {
+			margin-bottom: 0.5rem;
+		}
+
+		.page-buttons {
+			div, input {
+				&:first-child {
+					margin-bottom: 1rem;
+				}
+			}		
+		}
+
+		.form-error-box-wrapper {
+			margin: 0;
+
+			#ak-errors {
+				margin: 0;
+			}
+		}
+
+		.button.alert {
+			font-size: 2rem;
+		}
+	}
+}
