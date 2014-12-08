@@ -153,6 +153,23 @@
 
 		$(document).ready(function() {
 			/*
+				---------------------------------------------------------------
+					Resubmission - If this is a resubmission, go to page 3
+				---------------------------------------------------------------
+			*/
+
+			var page_to_show = 1;
+
+			if ( window.location.href.indexOf("error_card_num") >= 0) {
+				page_to_show = 3;
+			} 
+
+			if(page_to_show > 1) {
+				$('.page-1').hide();
+				$('.page-' + page_to_show).show();
+			}
+
+			/*
 				Add class to radio button label [Based on original AK function]
 			*/
 			$('.amounts input[name="amount"], .amounts input#amount_other_field').click(function() {
@@ -524,14 +541,14 @@
 							<div class="row amounts">
 								{% for amount in amounts %}
 									{% ifequal amount "other" %}
-										<div class="medium-8 columns amount-other">
+										<div class="small-8 columns amount-other">
 											<noscript><input type="radio" value="" class="amount_radio_button" name="amount"></noscript>
 											<label for="amount_other_field" class="ak-btn radio">
 												{{ page.currency_sym }}<input type="text" id="amount_other_field" class="amount-list" name="amount_other" size="3" onKeypress="clear_radio_buttons();" onClick="update_total()" onBlur="update_total()" onChange="update_total()">
 											</label>
 										</div>
 									{% else %}
-										<div class="medium-8 columns">
+										<div class="small-8 columns">
 											<label for="id_amount_{{amount}}" class="ak-btn radio">
 												<input type="radio" id="id_amount_{{amount}}" value="{{ amount }}" class="amount_radio_button amount-list" name="amount" onClick="clear_other(); update_total()"  onBlur="update_total()" onChange="update_total()" {% if not args.amount_other and amount == default_amount %}checked{% endif %}>{{ page.currency_sym }}{{ amount|commify }}
 											</label>
@@ -541,12 +558,12 @@
 							</div>							
 
 							<div class="page-buttons row">
-								<div class="{% if not page.custom_fields.disable_paypal %}small-11 {% else %}small-22 {% endif %} small-offset-1 columns donate-button">
+								<div class="{% if not page.custom_fields.disable_paypal %}medium-11 {% endif %}small-22 small-offset-1 columns donate-button">
 									<input type="button" class="medium button next" value="Donate!" data-page="2"/>
 								</div>
 
 								{% if not page.custom_fields.disable_paypal %}
-									<div class="small-11 columns paypal">
+									<div class="small-22 medium-11 small-offset-1 medium-offset-0 columns paypal">
 										<a id="paypal-button"><img src="https://s3.amazonaws.com/s3.alaskawild.org/images/paypal163x53.gif"></a>
 									</div> <!-- .paypal -->
 								{% endif %}
@@ -724,11 +741,11 @@
 							</div> <!-- .row -->
 
 							<div class="row submit-button">
-								<div class="small-8 columns">
+								<div class="medium-8 columns">
 									<input type="button" class="small button prev secondary" value="&lt; Back" data-page="2"/>
 								</div>
 
-								<div class="small-16 columns">
+								<div class="medium-16 columns">
 									{% if page.payment_processor_information.use_cse %}
 										{% if page.custom_fields.submit_button_text %}
 											<input type="submit" class="button alert" disabled="true" value="{{page.custom_fields.submit_button_text}}" />

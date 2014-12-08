@@ -222,6 +222,20 @@
 				-o-background-size: cover;
 				background-size: cover;
 			}
+
+			@media screen and (max-width: 50.5625rem) {
+				body {
+					background: #aaa;
+
+					{% if page.custom_fields.splash_page_mobile %}
+						background: url({{ page.custom_fields.splash_page_mobile }}) no-repeat center center fixed;
+						-webkit-background-size: cover;
+						-moz-background-size: cover;
+						-o-background-size: cover;
+						background-size: cover;
+					{% endif %}
+				}
+			}
 		</style>
 	{% endif %}
 </body>
