@@ -180,11 +180,13 @@
 				$(this).parent('label').addClass('checked');
 			});
 
+
 			/*
 				---------------------------------------------------------------
 					Forward / Back Buttons
 				---------------------------------------------------------------
 			*/
+
 			$('.next').click(function() {
 				if($('#act').valid()) {
 					var page = $(this).data('page');
@@ -212,6 +214,7 @@
 					});
 				});
 			});
+
 
 			/*
 				---------------------------------------------------------------
@@ -245,9 +248,22 @@
 				}
 			}, 250);
 
+			
 			/*
-				Overlaid Label Javascript. Borrows heavily from actionkit.js
+				---------------------------------------------------------------
+					If AK has a suggested ask, properly highlight it
+				---------------------------------------------------------------
 			*/
+			
+			$('input[type="radio"]:checked', '.amounts').prop('checked', false).click();
+
+
+			/*
+				---------------------------------------------------------------
+					Overlaid Label Javascript. Borrows heavily from actionkit.js
+				---------------------------------------------------------------
+			*/
+
 			function checkContent(field) {
 				var label = $("label[for='"+$(this).attr('id')+"']");
 
@@ -292,6 +308,7 @@
 					$('.submit').prop('disabled', true).val("Processing...");
 				}
 			});
+
 
 			/*
 				---------------------------------------------------------------
@@ -445,7 +462,7 @@
 {% endif %}
 
 {% if not page.custom_fields.disable_paypal %}
-	{% if page.custom_fields.donation_template_2 or page.custom_fields.donation_template_3 or page.custom_fields.donation_template_4 %}
+	{% if page.custom_fields.donation_template_2 or page.custom_fields.donation_template_3 or page.custom_fields.donation_template_4  or page.custom_fields.splash_page %}
 		<script>
 			$(document).ready(function() {
 				/*
@@ -564,7 +581,9 @@
 
 								{% if not page.custom_fields.disable_paypal %}
 									<div class="small-22 medium-11 small-offset-1 medium-offset-0 columns paypal">
-										<a id="paypal-button"><img src="https://s3.amazonaws.com/s3.alaskawild.org/images/paypal163x53.gif"></a>
+										<a id="paypal-button" class="button">
+											<span class="paypal-small">Donate with</span><span class="paypal-large">PayPal</span>
+										</a>
 									</div> <!-- .paypal -->
 								{% endif %}
 							</div> <!-- .page-buttons -->
@@ -694,7 +713,7 @@
 							<div class="row">
 								<div class="medium-12 columns">
 									<div class="row">
-										<div class="medium-12 columns"> 
+										<div class="small-12 columns"> 
 											<label for="exp_date_month">MM</label>
 											<select id="exp_date_month" type="text" name="exp_date_month">
 												<option value=""></option>
@@ -713,7 +732,7 @@
 											</select>
 										</div>
 
-										<div class="medium-12 columns">
+										<div class="small-12 columns">
 											<label for="exp_date_year">YYYY</label>
 											<select id="exp_date_year" type="text" name="exp_date_year">
 												<option value=""></option>
@@ -1096,7 +1115,7 @@
 					</div> <!-- .payment-form -->
 
 					<div class="row">
-						<div class="{% if page.custom_fields.disable_paypal %}small-24 {% else %}small-12 {% endif %}submit-button columns">
+						<div class="{% if not page.custom_fields.disable_paypal %}medium-12 {% endif %} small-24 submit-button columns">
 							{% if page.payment_processor_information.use_cse %}
 								{% if page.custom_fields.submit_button_text %}
 									<input type="submit" class="button alert" disabled="true" value="{{page.custom_fields.submit_button_text}}" />
@@ -1117,8 +1136,10 @@
 						</div> <!-- .submit-button -->                    
 
 						{% if not page.custom_fields.disable_paypal %}
-							<div class="small-12 columns paypal">
-								<a id="paypal-button"><img src="https://s3.amazonaws.com/s3.alaskawild.org/images/paypal163x53.gif"></a>
+							<div class="small-24 medium-12 columns paypal">
+								<a id="paypal-button" class="button">
+									<span class="paypal-small">Donate with</span><span class="paypal-large">PayPal</span>
+								</a>
 							</div> <!-- .paypal -->
 						{% endif %}
 
