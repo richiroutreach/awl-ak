@@ -8,12 +8,20 @@
 		</div> <!-- .text -->
 
 		<div class="share-buttons">
-			<a href="#" class="twitter"></a>
-			<a href="#" class="fb"></a>
-			<a href="#" class="email"></a>
+			<a href="http://twitter.com/share?url={{ page.canonical_url }}&text={{ page.title }}" class="twitter" target="newwindow" onClick="newWindow(400,600)"
+></a>
+			<a href="https://www.facebook.com/sharer/sharer.php?u={{ page.canonical_url }}" class="fb" target="newwindow" onClick="newWindow(400,600)"
+></a>
+			<a href="mailto:?subject={{ page.followup.taf_subject|urlencode }}&body={{ page.followup.taf_body|referring_akid:akid|tag_links:"source=mailto"|urlencode }}" class="email"></a>
 		</div>
 	</div> <!-- .inline-taf -->
 
+	<script>
+		function newWindow(height,width){
+			var settings = "height=" + height + ",width=" + width + ",status=yes,toolbar=no,menubar=no,location=no";
+			window.open("about:blank","newwindow", settings);
+		}
+	</script>
 
 {% comment %}
 <div class="ak-inline-taf">

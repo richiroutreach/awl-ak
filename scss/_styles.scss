@@ -801,8 +801,12 @@ input[type="submit"], button[type="submit"] {
 	}
 } 
 
+.signup-notice {
+	font-size: 0.75rem;
+	margin: 0.5rem 0;
+}
  
- 
+
 /*
 	--------------------------------------------------------------------------
 		Thank You Page (thanks.html)
@@ -1325,6 +1329,7 @@ ul#ak-errors {
 		&.alert {
 			padding: 0.25rem 1rem;
 			height: auto;
+			min-height: 46px;
 		}
 
 		&.small {
@@ -1412,17 +1417,13 @@ ul#ak-errors {
 
 		li {
 			margin-left: 1rem;
+			font-size: 1.25rem;
 			color: $errorColor;
-		}
-	}
+			padding-bottom: 0.25rem;
 
-	.form-error {
-		font-size: 1.25rem;
-		color: $errorColor;
-		padding-bottom: 0.25rem;
-
-		&:last-child {
-			padding-bottom: 0;
+			&:last-child {
+				padding-bottom: 0;
+			}
 		}
 	}
 }
@@ -1485,6 +1486,33 @@ ul#ak-errors {
 
 		.button.alert {
 			font-size: 2rem;
+		}
+	}
+}
+
+/*
+	--------------------------------------------------------------------------
+		Survey (survey.html)
+	--------------------------------------------------------------------------
+*/
+
+.wide-survey {
+	.survey-questions {
+		.row {
+			margin-bottom: 2rem;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+
+			label {
+				font-size: 1rem;
+				margin-bottom: 0.5rem;
+			}
+
+			input[type="radio"] {
+				margin-right: 0.5rem;
+			}
 		}
 	}
 }

@@ -98,6 +98,9 @@
 				total += parseFloat(other);
 		}
 
+		// Set the amount so GA can easily get it
+		$('#ga-amount').val(total.toFixed(2));
+
 		var new_total = total == 0 ? "" : '$' + total.toFixed(2);
 
 		if (new_total != $('#total').html()) {
@@ -133,6 +136,53 @@
 		}
 	{% endif %}
 </script>
+
+{% comment %}
+	/*
+		---------------------------------------------------------------------
+			Google Analytics Tracking - Start
+		---------------------------------------------------------------------
+	*/
+{% endcomment %}
+<script>
+	$(document).ready(function() {
+		// Set up tracking events on form submit
+		$('#act').submit(function() {
+			{% if page.custom_fields.splash_page %}
+				if( $(this).valid() ) {
+			{% endif %}
+				ga('send', 'event', 'Submission Attempt', 'Amount', $('#ga-amount').val());
+				ga('send', 'event', 'Submission Attempt', 'Type', $('input[name="donation_type"]:checked').val());
+
+				{% if user.email %}
+					ga('send', 'event', 'Submission Attempt', 'User', '{{ user.email }} for $' + $('#ga-amount').val() + '(' + $('input[name="donation_type"]:checked').val() + ')');
+				{% endif %}
+
+				return true;
+			{% if page.custom_fields.splash_page %}
+				}
+			{% endif %}
+		});
+
+		// Set up tracking for donation type change
+		$('input[name="donation_type"]').change(function() {
+			if( $(this).is(':checked') ) {
+				ga('send', 'event', 'Form Interaction', 'Change Donation Type', $(this).val());
+
+				{% if user.email %}
+					ga('send', 'event', 'Form Interaction', 'User', 'Type Changed (' + $(this).val() + ')' );
+				{% endif %}				
+			}
+		});
+	});
+</script>
+{% comment %}
+	/*
+		---------------------------------------------------------------------
+			Google Analytics Tracking - End
+		---------------------------------------------------------------------
+	*/
+{% endcomment %}
 
 {% if page.custom_fields.splash_page %}
 	{% comment %}
@@ -188,10 +238,10 @@
 			*/
 
 			$('.next').click(function() {
-				if($('#act').valid()) {
-					var page = $(this).data('page');
-					var button = $(this);
-					
+				var page = $(this).data('page');
+				var button = $(this);
+
+				if($('#act').valid()) {			
 					$(button).prop('disabled', true);
 
 					$('.page-' + (page - 1)).fadeOut(300, function() {
@@ -199,6 +249,17 @@
 							$(button).prop('disabled', false);
 						});
 					});
+					ga('send', 'event', 'Form Interaction', 'Next Pressed', (page - 1));
+
+					{% if user.email %}
+						ga('send', 'event', 'Form Interaction', 'User', 'Next Pressed ({{ user.email }} on ' + (page - 1) + ')');
+					{% endif %}
+				} else {
+					ga('send', 'event', 'Form Interaction', 'Validation Failure', (page - 1));
+
+					{% if user.email %}
+						ga('send', 'event', 'Form Interaction', 'User', 'Validation Failure ({{ user.email }} on ' + (page - 1) + ')');
+					{% endif %}
 				}
 			});
 
@@ -213,6 +274,12 @@
 						$(button).prop('disabled', false);
 					});
 				});
+
+				ga('send', 'event', 'Form Interaction', 'Back Pressed', (page + 1));
+
+				{% if user.email %}
+					ga('send', 'event', 'Form Interaction', 'User', 'Back Pressed ({{ user.email }} on ' + (page + 1) + ')');
+				{% endif %}
 			});
 
 
@@ -522,9 +589,19 @@
 {% endwith %}
 
 {% if page.custom_fields.splash_page %}
+	{% comment %}
+		/*
+			---------------------------------------------------------------
+				START - Staged Donation Form - Markup
+			---------------------------------------------------------------
+		*/
+	{% endcomment %}
 	<div class="medium-24 columns alternate-layout splash-layout">
 		<form id="act" name="act" class="donate-form{% if page.payment_processor_information.use_tr %} braintree_form{% endif %}" method="POST" action="/act/" accept-charset="utf-8">
 			<input type="hidden" name="page" value="{{ page.name }}">                         
+			<input type="hidden" name="ga-amount" id="ga-amount" value="0">
+			<input type="hidden" name="orig_akid" value="{{ akid }}">
+			<input type="radio" id="id_type_single" name="donation_type" value="single" class="hidden" checked>
 
 			<div class="hidden">
 				<div id="total"></div>
@@ -824,9 +901,25 @@
 			{% endif %}
 		</form>
 	{% endif %}
+	{% comment %}
+		/*
+			---------------------------------------------------------------
+				END - Staged Donation Form - Markup
+			---------------------------------------------------------------
+		*/
+	{% endcomment %}
 {% elif page.custom_fields.donation_template_2 or page.custom_fields.donation_template_3 or page.custom_fields.donation_template_4 %}
+	{% comment %}
+		/*
+			---------------------------------------------------------------
+				START - Alternate Layout Donation Form - Markup
+			---------------------------------------------------------------
+		*/
+	{% endcomment %}
 	<div class="medium-offset-5 medium-19 columns alternate-layout">
 		<form id="act" name="act" class="donate-form{% if page.payment_processor_information.use_tr %} braintree_form{% endif %}" method="POST" action="/act/" accept-charset="utf-8">
+			<input type="hidden" name="orig_akid" value="{{ akid }}">
+
 			<div class="hidden">
 				<div id="total"></div>
 			</div>
@@ -918,36 +1011,6 @@
 						<div id="unknown_user"></div>
 
 						<div>
-							{% load actionkit_tags smartif switchcase %}
-
-							{% filter remove_blank_lines %}
-								{% field_order name email prefix first_name middle_name last_name suffix country address1 address2 city state zip region postal phone %}
-								{% hide_by_default prefix first_name middle_name last_name suffix country phone address1 address2 city state region postal %}   
-
-								{% for field in fields %}
-									{% if field|is_in:context.required %}
-										<script type="text/ak-template" for="{{field}}req">
-											*
-										</script>
-									{% endif %}
-
-									{% if "last_name"|is_in:context.required %}
-										<script type="text/ak-template" for="namereq">
-											*
-										</script>
-									{% endif %}
-
-									{% if "first_name"|is_in:context.required %}
-										{% if "last_name"|is_in:context.required %}
-										{% else %}
-											<script type="text/ak-template" for="namereq">
-												*
-											</script>
-										{% endif %}
-									{% endif %}
-								{% endfor %}
-							{% endfilter %}
-
 							<div class="row">
 								<div class="medium-12 columns">
 									<label for="first_name"><span id="first_namereq" class="first_namereq req">*</span>First Name:</label> 
@@ -1147,6 +1210,12 @@
 							Click only once to process your donation.<br/><br/>
 							<span class="req">*</span>&nbsp;Indicates required field<br/><br/>
 
+							{% if page.custom_fields.donation_template_2 or page.custom_fields.donation_template_3 or page.custom_fields.donation_template_4 %}			
+								<div class="ask-text show-for-small columns">
+									{% include_tmpl form.ask_text %}
+								</div> <!-- .ask-text -->
+							{% endif %}
+
 							<div class="security-seals">
 								<!-- GeoTrust QuickSSL [tm] Smart  Icon tag. Do not edit. -->
 									<script language="javascript" type="text/javascript" src="//smarticon.geotrust.com/si.js"></script>
@@ -1157,12 +1226,6 @@
 						<div>{% include "./progress_meter.html" %}</div>
 					</div> <!-- .row -->                    
 				</div> <!-- .payment-form -->
-
-				{% if page.custom_fields.donation_template_4 %}			
-					<div class="ask-text small-24 show-for-small columns">
-						{% include_tmpl form.ask_text %}
-					</div> <!-- .ask-text -->
-				{% endif %}
 			</div> <!-- .row -->
 		</form>
 
@@ -1191,13 +1254,28 @@
 				{% endif %}
 			</form>
 		{% endif %}
+	{% comment %}
+		/*
+			---------------------------------------------------------------
+				END - Alternate Layout Donation Form - Markup
+			---------------------------------------------------------------
+		*/
+	{% endcomment %}		
 {% else %}
-   <div class="medium-24 columns page-title">
-        <h2>{{ page.title }}</h2>
-   </div>
+	{% comment %}
+		/*
+			---------------------------------------------------------------
+				START - Classic Layout Donation Form - Markup
+			---------------------------------------------------------------
+		*/
+	{% endcomment %}
+	<div class="medium-24 columns page-title">
+		<h2>{{ page.title }}</h2>
+	</div>
 
-   <div class="small-24 medium-10 columns medium-push-13 page-form">
-             <form id="act" name="act" class="donate-form{% if page.payment_processor_information.use_tr %} braintree_form{% endif %}" method="POST" action="/act/" accept-charset="utf-8">
+	<div class="small-24 medium-10 columns medium-push-13 page-form">
+		<form id="act" name="act" class="donate-form{% if page.payment_processor_information.use_tr %} braintree_form{% endif %}" method="POST" action="/act/" accept-charset="utf-8">
+			<input type="hidden" name="orig_akid" value="{{ akid }}">
                   <div class="row">
                        <div class="medium-24 columns">
                             <div class="form-pretext">
@@ -1321,36 +1399,6 @@
                                       <div id="unknown_user"></div>
                            
                                       <div>
-                                           {% load actionkit_tags smartif switchcase %}
-
-                                           {% filter remove_blank_lines %}
-                                                {% field_order name email prefix first_name middle_name last_name suffix country address1 address2 city state zip region postal phone %}
-                                                {% hide_by_default prefix first_name middle_name last_name suffix country phone address1 address2 city state region postal %}   
-                                
-                                                {% for field in fields %}
-                                                     {% if field|is_in:context.required %}
-                                                          <script type="text/ak-template" for="{{field}}req">
-                                                               *
-                                                          </script>
-                                                     {% endif %}
-                                    
-                                                     {% if "last_name"|is_in:context.required %}
-                                                          <script type="text/ak-template" for="namereq">
-                                                               *
-                                                          </script>
-                                                     {% endif %}
-                                    
-                                                     {% if "first_name"|is_in:context.required %}
-                                                          {% if "last_name"|is_in:context.required %}
-                                                          {% else %}
-                                                               <script type="text/ak-template" for="namereq">
-                                                                    *
-                                                               </script>
-                                                          {% endif %}
-                                                     {% endif %}
-                                                {% endfor %}
-                                           {% endfilter %}
-
                                            <div class="row">
                                                 <div class="medium-12 columns">
                                                      <label for="first_name">First Name<span id="first_namereq" class="first_namereq req"></span>:</label> 
@@ -1622,11 +1670,22 @@
              </form>
    </div> <!-- page-form -->
 
-   <div class="small-24 medium-12 medium-pull-11 medium-offset-1 columns page-text">
-        {% include_tmpl form.ask_text %}
-   </div> <!-- page-text -->
+	<div class="small-24 medium-12 medium-pull-11 medium-offset-1 columns page-text">
+		{% include_tmpl form.ask_text %}
+	</div> <!-- page-text -->
+	{% comment %}
+		/*
+			---------------------------------------------------------------
+				END - Classic Layout Donation Form - Markup
+			---------------------------------------------------------------
+		*/
+	{% endcomment %}
 {% endif %}
 {% endblock %}
+
+{% if pp.use_cse %}
+	<script src="https://js.braintreegateway.com/v1/braintree-data.js"></script>
+{% endif %}
 
 {% block footer %}
 {% endblock %}

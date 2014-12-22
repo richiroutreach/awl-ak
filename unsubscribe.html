@@ -2,50 +2,60 @@
 {% load smartif %}
 
 {% block content %}
+<!-- @START unsubscribe.html -->
+	<div class="medium-24 columns page-title">
+		<h2>{{ page.title }}</h2>
+	</div>
 
-<h2>{{ page.title }}</h2>
+	<div class="medium-9 medium-push-14 columns right-column">
+		<form id="unsub-form" class="col" name="act" method="POST" action="/act/" accept-charset="utf-8">
+			<ul class="compact" id="ak-errors"></ul>
 
-<div class="area">
-{% autoescape off %}
+			<div id="unknown_user">
+				<div class="ak-labels-above"> 
+					<div>
+						<label for="id_email">E-mail address</label>
+						<input id="id_email" type="text" name="email" size=40 />
+					</div>
 
-{% include_tmpl form.introduction_text %}
+					<input type="hidden" name="country" value="United States" />
+				</div>
+			</div>
 
-{% endautoescape %}
-</div>
+			<div id="known_user">
+				<div>
+					<span style="color: red">Not <span id="known_user_name"></span>?  Please don't use this form!</span>
+				</div>
+			</div>
 
-<form id="unsub-form" class="col" name="act" method="POST" action="/act/" accept-charset="utf-8">
+			{% if user.subscriptions|length > 1 %}
+				<fieldset>
+					<input type="hidden" name="have_unsub_lists" value="1" />
 
-<ul class="compact" id="ak-errors"></ul>
-<div id="unknown_user">
-<div class="ak-labels-above"> 
-    <div><label for="id_email">E-mail address</label><input id="id_email" type="text" name="email" size=40 /></div>
-    <input type="hidden" name="country" value="United States" />
-</div>
-</div>
-<div id="known_user">
-<div><span style="color: red">Not <span id="known_user_name"></span>?  Please don't use this form!</span></div>
-</div>
+					{% for s in user.subscriptions %}
+						<input type="checkbox" checked name="unsub_lists" value="{{ s.list.id }}" />
+						Unsubscribe from {{ s.list.name }}<br />
+					{% endfor %}
+				</fieldset>
+			{% endif %}
+			
+			{% autoescape off %}
+				{% include_tmpl form.survey_question_text %}
+			{% endautoescape %}
 
-{% if user.subscriptions|length > 1 %}
-<fieldset>
-<input type="hidden" name="have_unsub_lists" value="1" />
-{% for s in user.subscriptions %}
-<input type="checkbox" checked name="unsub_lists" value="{{ s.list.id }}" />
-Unsubscribe from {{ s.list.name }}<br />
-{% endfor %}
-</fieldset>
-{% endif %}
+			<textarea name="action_survey"></textarea></p>
 
-{% autoescape off %}
-{% include_tmpl form.survey_question_text %}
-{% endautoescape %}
-<textarea name="action_survey"></textarea></p>
+			<button type="submit" class="button">Unsubscribe</button>
 
-<button type="submit">Unsubscribe</button>
+			<input type="hidden" name="page" value="{{ page.name }}">
+		</form>
+	</div>
 
-<input type="hidden" name="page" value="{{ page.name }}">
-
-
-</form>
-
+	<div class="medium-13 medium-offset-1 medium-pull-9 columns left about-text">
+		<div class="form-pretext">
+			{% autoescape off %}
+				{% include_tmpl form.introduction_text %}
+			{% endautoescape %}
+		</div> <!-- .pretext -->
+	</div> <!-- .left-column -->
 {% endblock %}
