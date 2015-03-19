@@ -824,7 +824,7 @@ input[type="submit"], button[type="submit"] {
 
 	.email-ask {
 		color: $teal;
-		font-size: 2rem;
+		font-size: 1rem;
 		margin-bottom: 1rem;	
 	}
 
@@ -894,6 +894,20 @@ input[type="submit"], button[type="submit"] {
 
 		h2 {
 			display: none;
+		}
+	}
+}
+
+.thanks-page {
+	.medium-9.medium-right.columns.taf-buttons {
+		float: right;
+
+		.button {
+			padding: 0.5rem 1.5rem;
+		}
+
+		textarea {
+			height: 100px;
 		}
 	}
 }
