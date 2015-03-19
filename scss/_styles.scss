@@ -1530,3 +1530,67 @@ ul#ak-errors {
 		}
 	}
 }
+
+
+/*
+	--------------------------------------------------------------------------
+		Progress Bar (progress_meter.html)
+	--------------------------------------------------------------------------
+*/
+
+#progress {
+	margin-bottom: 1rem;
+	font-size: 1rem;
+
+	.progress-holder {
+		margin-bottom: 0.5rem;
+		background: white;
+		border: 2px solid $teal;
+		position: relative;
+		width: 100%;
+	}
+
+	.progress-bar {
+		background: $orange;
+	}
+
+	.progress-percent {
+		text-align: center;
+		position: absolute;
+		top: 1px;
+		width: 100%;
+		font-weight: bold;
+	}
+}
+
+
+/*
+	--------------------------------------------------------------------------
+		Store Page
+	--------------------------------------------------------------------------
+*/
+
+.page-text {
+	td {
+		width: 50%;
+		padding: 1rem;
+		vertical-align: top;
+	}
+
+	tr {
+		margin-bottom: 3rem;
+
+		&:last-child {
+			padding-bottom: 0;
+		}
+	}
+
+	.row {
+		padding-bottom: 3rem;
+		background: white;
+
+		&:last-child {
+			padding-bottom: 0;
+		}
+	}
+}
