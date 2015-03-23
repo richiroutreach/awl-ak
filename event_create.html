@@ -170,7 +170,7 @@ input[disabled] { background-color: rgb(200,200,200); }
     </div>
     {% endif %}
     
-    <div><label for="id_event_max_attendees">Max. signups</label> <input id="id_event_max_attendees" type="text" name="event_max_attendees" value="{{ campaign.default_event_size }}" size=3 /></div>
+    <div><label for="id_event_max_attendees">Max. signups</label> <input id="id_event_max_attendees" type="text" name="event_max_attendees" value="{{ campaign.default_event_size|default:"" }}" size=3 /></div>
     
     {% include_tmpl form.custom_field_html %}
 </div>

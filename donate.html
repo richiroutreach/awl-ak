@@ -137,28 +137,60 @@
 	{% endif %}
 </script>
 
+
 {% comment %}
 	/*
-		---------------------------------------------------------------------
-			Google Analytics Tracking - Start
-		---------------------------------------------------------------------
+-------------------------------------------------------------------------------
+		@START - Google Analytics Tracking
+-------------------------------------------------------------------------------
 	*/
 {% endcomment %}
 <script>
+	/*
+		Function to make GA events for problems during donating
+	*/
+	function logValidationErrors() {
+		$('#ak-errors li').each(function() {
+			var errorMessage = $(this).html();
+
+			if(errorMessage.length > 0 && errorMessage != "For your security, your card number has been cleared.") {
+				if(knownUser) {
+					ga( 'send', 'event', 'Validation Error', '{{ user.email }}', errorMessage, {{ page.id }} );
+				} else if ( $('#email').val() != "" ) {
+					ga( 'send', 'event', 'Validation Error', $('#email').val(), errorMessage, {{ page.id }} );
+				} else {
+					ga( 'send', 'event', 'Validation Error', 'Unknown User', errorMessage, {{ page.id }} );
+				}
+				
+				if ( typeof $.cookie('user') !== 'undefined') { 
+					ga( 'send', 'event', 'Cookie', 'Validation Error', $.cookie('user') + ': ' + errorMessage + " on {{ page.id }}", {{ page.id }} );			
+					ga( 'send', 'event', 'Cookie', $.cookie('user'), 'Validation Error: ' + errorMessage + " on {{ page.id }}", {{ page.id }} );			
+				}				
+			}
+		});
+	}
+
 	$(document).ready(function() {
 		// Set up tracking events on form submit
 		$('#act').submit(function() {
 			{% if page.custom_fields.splash_page %}
 				if( $(this).valid() ) {
 			{% endif %}
-				ga('send', 'event', 'Submission Attempt', 'Amount', $('#ga-amount').val());
-				ga('send', 'event', 'Submission Attempt', 'Type', $('input[name="donation_type"]:checked').val());
+				if(knownUser) {
+					ga('send', 'event', 'Submission Attempt', '{{ user.email }}', 'Amount (' + $('#ga-amount').val() + ')', {{ page.id }});
+					ga('send', 'event', 'Submission Attempt', '{{ user.email }}', 'Type (' + $('input[name="donation_type"]:checked').val() + ')', {{ page.id }});	
+				} else if ( $('#email').val() != "" ) {
+					ga('send', 'event', 'Submission Attempt', $('#email').val(), 'Amount (' + $('#ga-amount').val() + ')', {{ page.id }});
+					ga('send', 'event', 'Submission Attempt', $('#email').val(), 'Type (' + $('input[name="donation_type"]:checked').val() + ')', {{ page.id }});	
+				} else {
+					ga('send', 'event', 'Submission Attempt', 'Unknown User', 'Amount (' + $('#ga-amount').val() + ')', {{ page.id }});
+					ga('send', 'event', 'Submission Attempt', 'Unknown User', 'Type (' + $('input[name="donation_type"]:checked').val() + ')', {{ page.id }});
+				}
 
-				{% if user.email %}
-					ga('send', 'event', 'Submission Attempt', 'User', '{{ user.email }} for $' + $('#ga-amount').val() + '(' + $('input[name="donation_type"]:checked').val() + ')');
-				{% endif %}
-
-				return true;
+				if ( typeof $.cookie('user') !== 'undefined') { 
+					ga('send', 'event', 'Cookie', 'Submission Attempt', $.cookie('user') + ' on {{ page.id }} for ' + $('#ga-amount').val() + ' (' + $('input[name="donation_type"]:checked').val() + ')');
+					ga('send', 'event', 'Cookie', $.cookie('user'), 'Submission Attempt on {{ page.id }} for ' + $('#ga-amount').val() + ' (' + $('input[name="donation_type"]:checked').val() + ')');
+				}
 			{% if page.custom_fields.splash_page %}
 				}
 			{% endif %}
@@ -167,20 +199,127 @@
 		// Set up tracking for donation type change
 		$('input[name="donation_type"]').change(function() {
 			if( $(this).is(':checked') ) {
-				ga('send', 'event', 'Form Interaction', 'Change Donation Type', $(this).val());
+				if(knownUser) {
+					ga( 'send', 'event', 'Form Interaction', '{{ user.email }}', 'Type Changed (' + $(this).val() + ')', {{ page.id }} );
+				} else if ( $('#email').val() != "" ) {
+					ga( 'send', 'event', 'Form Interaction', $('#email').val(), 'Type Changed (' + $(this).val() + ')', {{ page.id }} );
+				} else {
+					ga('send', 'event', 'Form Interaction', 'Unkown User', 'Type Changed ('+ $(this).val() + ')', {{ page.id }} );
+				}			
 
-				{% if user.email %}
-					ga('send', 'event', 'Form Interaction', 'User', 'Type Changed (' + $(this).val() + ')' );
-				{% endif %}				
+				if ( typeof $.cookie('user') !== 'undefined') { 
+					ga( 'send', 'event', 'Cookie', 'Form Interaction', 'Type Changed (' + $.cookie('user') + ' to ' + $(this).val() + ')', {{ page.id }});
+					ga( 'send', 'event', 'Cookie', $.cookie('user'),  'Type Changed to ' + $(this).val() + ' on {{ page.id }}', {{ page.id }});
+				}
 			}
 		});
+
+		// Track "next" button clicked
+		$('.next').click(function() {
+			var page = $(this).data('page');
+			{% if page.custom_fields.splash_page %}
+				if($('#act').valid()) {
+			{% endif %}
+				if(knownUser) {
+					ga('send', 'event', 'Form Interaction', '{{ user.email }}', 'Next Pressed (' + (page - 1) + ')');
+				} else if ( $('#email').val() != "" ) {
+					ga('send', 'event', 'Form Interaction', $('#email').val(), 'Next Pressed (' + (page - 1) + ')');
+				} else {
+					ga('send', 'event', 'Form Interaction', 'Unknown User', 'Next Pressed (' + (page - 1) + ')');
+				}
+
+				if ( typeof $.cookie('user') !== 'undefined') { 
+					ga( 'send', 'event', 'Cookie', 'Form Interaction', 'Next Pressed (' + $.cookie('user') + ' on {{ page.id }})', {{ page.id }});
+					ga( 'send', 'event', 'Cookie', $.cookie('user'),  'Form Interfaction - Next Pressed {{ page.id }}', {{ page.id }});			
+				}
+			{% if page.custom_fields.splash_page %}
+				} else {
+			{% endif %}
+				logValidationErrors();
+
+				if ( typeof $.cookie('user') !== 'undefined') { 
+					ga( 'send', 'event', 'Cookie', 'Form Interaction', 'Next Pressed w/ Errors (' + $.cookie('user') + ' on {{ page.id }})', {{ page.id }});
+					ga( 'send', 'event', 'Cookie', $.cookie('user'),  'Form Interfaction - Next Pressed w/ Errors {{ page.id }}', {{ page.id }});			
+				}
+			{% if page.custom_fields.splash_page %}
+				}
+			{% endif %}
+		});
+
+		// Track "prev" button clicked
+		$('.prev').click(function() {
+			var page = $(this).data('page');
+
+			if(knownUser) {
+				ga('send', 'event', 'Form Interaction', '{{ user.email }}', 'Back Pressed (' + (page + 1) + ')');
+			} else if ( $('#email').val() != "" ) {
+				ga('send', 'event', 'Form Interaction', $('#email').val(), 'Back Pressed (' + (page + 1) + ')');
+			} else {
+				ga('send', 'event', 'Form Interaction', 'Unknown User', 'Back Pressed (' + (page + 1) + ')');
+			}
+		});
+
+		// Log any errors that AK spits back
+		window.setTimeout(function() {
+			logValidationErrors();
+		}, 500);
 	});
 </script>
+
 {% comment %}
 	/*
-		---------------------------------------------------------------------
-			Google Analytics Tracking - End
-		---------------------------------------------------------------------
+-------------------------------------------------------------------------------
+		@START - PayPal Integration Script
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
+{% if show_paypal %}
+	<script>
+		function submit_paypal() {
+			/* clear out CC info if entered */
+			$('#card_num').val('');
+			$('#card_code').val('');
+
+			/* and keep submitting */
+			return True;
+		}
+
+		function paypalradios() {
+			$(".ak-cc-box").addClass('ak-hide');
+			
+			$("input[type='radio']").click(function() {
+				if ($("#pay_by_cc").is(':checked')) {
+					$(".ak-cc-box").slideDown();
+				}
+
+				if ($("#pay_by_paypal").is(':checked')) {
+					$(".ak-cc-box").slideUp();
+				}
+			}); 
+
+			if ($("#pay_by_cc").is(':checked')) {
+				$(".ak-cc-box").show()
+			}
+		}
+
+		$(document).ready(function() {
+			paypalradios();
+		});
+	</script>
+{% endif %}
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+		@END - PayPal Integration Script
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
+
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+		@END - Google Analytics Tracking
+-------------------------------------------------------------------------------
 	*/
 {% endcomment %}
 
@@ -249,17 +388,6 @@
 							$(button).prop('disabled', false);
 						});
 					});
-					ga('send', 'event', 'Form Interaction', 'Next Pressed', (page - 1));
-
-					{% if user.email %}
-						ga('send', 'event', 'Form Interaction', 'User', 'Next Pressed ({{ user.email }} on ' + (page - 1) + ')');
-					{% endif %}
-				} else {
-					ga('send', 'event', 'Form Interaction', 'Validation Failure', (page - 1));
-
-					{% if user.email %}
-						ga('send', 'event', 'Form Interaction', 'User', 'Validation Failure ({{ user.email }} on ' + (page - 1) + ')');
-					{% endif %}
 				}
 			});
 
@@ -274,12 +402,6 @@
 						$(button).prop('disabled', false);
 					});
 				});
-
-				ga('send', 'event', 'Form Interaction', 'Back Pressed', (page + 1));
-
-				{% if user.email %}
-					ga('send', 'event', 'Form Interaction', 'User', 'Back Pressed ({{ user.email }} on ' + (page + 1) + ')');
-				{% endif %}
 			});
 
 
@@ -602,6 +724,7 @@
 			<input type="hidden" name="ga-amount" id="ga-amount" value="0">
 			<input type="hidden" name="orig_akid" value="{{ akid }}">
 			<input type="radio" id="id_type_single" name="donation_type" value="single" class="hidden" checked>
+			<input type="hidden" name="recurring_start" value="{% now "Y-m-d" %}">
 
 			<div class="hidden">
 				<div id="total"></div>
@@ -919,6 +1042,7 @@
 	<div class="medium-offset-5 medium-19 columns alternate-layout">
 		<form id="act" name="act" class="donate-form{% if page.payment_processor_information.use_tr %} braintree_form{% endif %}" method="POST" action="/act/" accept-charset="utf-8">
 			<input type="hidden" name="orig_akid" value="{{ akid }}">
+			<input type="hidden" name="recurring_start" value="{% now "Y-m-d" %}">
 
 			<div class="hidden">
 				<div id="total"></div>
@@ -1216,14 +1340,14 @@
 								</div> <!-- .ask-text -->
 							{% endif %}
 
+							{% include "./progress_meter.html" %}
+
 							<div class="security-seals">
 								<!-- GeoTrust QuickSSL [tm] Smart  Icon tag. Do not edit. -->
 									<script language="javascript" type="text/javascript" src="//smarticon.geotrust.com/si.js"></script>
 								<!-- end  GeoTrust Smart Icon tag -->
 							</div> <!-- .security-seals -->
 						</div> <!-- .form-instructions -->
-
-						<div>{% include "./progress_meter.html" %}</div>
 					</div> <!-- .row -->                    
 				</div> <!-- .payment-form -->
 			</div> <!-- .row -->
@@ -1276,410 +1400,427 @@
 	<div class="small-24 medium-10 columns medium-push-13 page-form">
 		<form id="act" name="act" class="donate-form{% if page.payment_processor_information.use_tr %} braintree_form{% endif %}" method="POST" action="/act/" accept-charset="utf-8">
 			<input type="hidden" name="orig_akid" value="{{ akid }}">
-                  <div class="row">
-                       <div class="medium-24 columns">
-                            <div class="form-pretext">
-                                 {% if page.custom_fields.custom_form_title %}{{ page.custom_fields.custom_form_title }}{% else %}Donate!{% endif %}
-                            </div> <!-- .form-pretext -->
+			<input type="hidden" name="recurring_start" value="{% now "Y-m-d" %}">
 
-                            <div class="errors">
-                                 <ul id="ak-errors"></ul>
-                            </div> <!-- .errors -->
+				<div class="row">
+					<div class="medium-24 columns">
+						<div class="form-pretext">
+							{% if page.custom_fields.custom_form_title %}{{ page.custom_fields.custom_form_title }}{% else %}Donate!{% endif %}
+						</div> <!-- .form-pretext -->
 
-                            {% if has_products %}
-                                 <div id="product_list">
-                                      <label id="products-label" class="ak-label-above">Product{% if products|length > 1 %}s{% endif %}</label>
-                                      
-                                      <table>
-                                           <tr id="product-table-headers">
-                                                <th id="product-quantity-header">Quantity</th>
-                                                <th id="product-details-header">Product</th>
-                                                <th id="product-amount-header">Price</th>
-                                           </tr>
+						<div class="errors">
+							<ul id="ak-errors"></ul>
+						</div> <!-- .errors -->
 
-                                           {% for product in products %}
-                                                <tr>
-                                                     <td class="product-quantity">
-                                                          {% ifequal product.max 1 %}
-                                                               <input type="checkbox" value="1" name="product_{{ product.id }}" id="product_{{ product.id }}" class="ak_product_inputs" onBlur="update_total()" onChange="update_total()">
-                                                          {% else %}
-                                                               <input type="text" name="product_{{ product.id }}" id="product_{{ product.id }}" size="2" class="ak_product_inputs" onBlur="update_total()" onChange="update_total()">
-                                                          {% endifequal %}
-                                                     </td>
+						{% if has_products %}
+							<div id="product_list">
+								<label id="products-label" class="ak-label-above">Product{% if products|length > 1 %}s{% endif %}</label>
 
-                                                     <td class="product-details">
-                                                          <div class="product-name">{{ product.name }}</div>
+								<table>
+									<tr id="product-table-headers">
+										<th id="product-quantity-header">Quantity</th>
+										<th id="product-details-header">Product</th>
+										<th id="product-amount-header">Price</th>
+									</tr>
 
-                                                          {% if product.desc %}<div class="product-description">{{ product.desc }}</div>{% endif %}
-                                                     </td>
+									{% for product in products %}
+										<tr>
+											<td class="product-quantity">
+												{% ifequal product.max 1 %}
+													<input type="checkbox" value="1" name="product_{{ product.id }}" id="product_{{ product.id }}" class="ak_product_inputs" onBlur="update_total()" onChange="update_total()">
+												{% else %}
+													<input type="text" name="product_{{ product.id }}" id="product_{{ product.id }}" size="2" class="ak_product_inputs" onBlur="update_total()" onChange="update_total()">
+												{% endifequal %}
+											</td>
 
-                                                     <td class="product-amount">
-                                                          <span id="product_{{ product.id }}_price">{% ifequal product.price 0 %}FREE!{% else %}{{ product.amt|commify }}{% endifequal %}</span>
-                                                     </td>
-                                                </tr>
-                                           {% endfor %}
-                                      </table>
-                                 </div> <!-- #product_list -->
+											<td class="product-details">
+												<div class="product-name">{{ product.name }}</div>
 
-                                 <div id="total_div" class="donation-total">
-                                      <h3>Total Amount: <span id="total"></span></h3>
-                                 </div> <!-- .donation-total -->
+												{% if product.desc %}<div class="product-description">{{ product.desc }}</div>{% endif %}
+											</td>
 
-                            {% endif %}
+											<td class="product-amount">
+												<span id="product_{{ product.id }}_price">{% ifequal product.price 0 %}FREE!{% else %}{{ product.amt|commify }}{% endifequal %}</span>
+											</td>
+										</tr>
+									{% endfor %}
+								</table>
+							</div> <!-- #product_list -->
+
+							<div id="total_div" class="donation-total">
+								<h3>Total Amount: <span id="total"></span></h3>
+							</div> <!-- .donation-total -->
+						{% endif %}
     
-                            <div class="amount">
-                                 {% if amounts %}
-                                      <div id="amount_list">
-                                           <h3 class="donate-header">Amount:</h3>
-                                  
-                                           <table>
-                                                {% for row in amounts|columns:3 %}
-                                                     <tr>
-                                                          {% for amount in row %}
-                                                               {% ifequal amount "other" %}
-                                                                    {% comment %}
-                                                                         <td colspan="2">
-                                                                              <noscript><input type="radio" value="" class="amount_radio_button" name="amount"></noscript>
-                                                                              Other $<input type="text" id="amount_other_field" name="amount_other" size="3" onFocus="clear_radio_buttons();" onClick="update_total()" onBlur="update_total()" onChange="update_total()">
-                                                                         </td>
-                                                                    {% endcomment %}
-                                                               {% else %}
-                                                                    <td>
-                                                                         <input type="radio" value="{{ amount }}" class="amount_radio_button" name="amount" onClick="clear_other(); update_total()"  onBlur="update_total()" onChange="update_total()" {% if not args.amount_other and amount == default_amount %}checked{% endif %}>&nbsp;${{ amount }}
-                                                                    </td>
-                                                               {% endifequal %}
-                                                          {% endfor %}
-                                                     </tr>
-                                                {% endfor %}
+						<div class="amount">
+							{% if amounts %}
+								<div id="amount_list">
+									<h3 class="donate-header">Amount:</h3>
 
-                                                {% for amount in amounts %}
-                                                     {% ifequal amount "other" %}
-                                                          <tr>
-                                                               <td colspan="3">
-                                                                    <noscript><input type="radio" value="" class="amount_radio_button" name="amount"></noscript>
-                                                                    <div class="other-amount-label">Other $</div><input type="text" id="amount_other_field" name="amount_other" size="3" onFocus="clear_radio_buttons();" onClick="update_total()" onBlur="update_total()" onChange="update_total()">
-                                                               </td>
-                                                          </tr>
-                                                     {% endifequal %}
-                                                {% endfor %}
-                                           </table>
-                            
-                                           {% if not has_products %}
-                                                {% if allow_monthly %}
-                                                     <div id="type">
-                                                          <h3 class="donate-header">Type:</h3>
-                                                          <div class="medium-12 columns">
-                                                               <input type="radio" name="donation_type" value="single"{% if page.custom_fields.monthly_default %}{% else %} checked{%endif %}> One-Time
-                                                          </div>
+									<table>
+										<!-- Should set td's into 3 columns -->
+										{% for row in amounts|columns:4 %}
+											<tr>
+												{% for amount in row %}
+													{% ifequal amount "other" %}
+														<!-- Other amount will show in its own row below the set amounts -->
+													{% else %}
+														<td>
+															<input type="radio" value="{{ amount }}" class="amount_radio_button" name="amount" onClick="clear_other(); update_total()"  onBlur="update_total()" onChange="update_total()" {% if not args.amount_other and amount == default_amount %}checked{% endif %}>&nbsp;${{ amount }}
+														</td>
+													{% endifequal %}
+												{% endfor %}
+											</tr>
+										{% endfor %}
 
-                                                          <div class="medium-12 columns">
-                                                               <input type="radio" name="donation_type" value="recurring"{% if page.custom_fields.monthly_default %} checked{% else %}{%endif %}> Monthly
-                                                          </div>
-                                                     </div>
-                                                {% else %}
-                                                     <input type="hidden" name="donation_type" value="single">
-                                                {% endif %}
-                                           {% endif %}
-                                      </div> <!-- #amount_list -->
-                                 {% endif %}
-                            </div> <!-- .amount -->
-                       </div> <!-- .medium -->
+										{% for amount in amounts %}
+											{% ifequal amount "other" %}
+												<tr>
+													<td colspan="3">
+														<noscript><input type="radio" value="" class="amount_radio_button" name="amount"></noscript>
+														<div class="other-amount-label">Other $</div><input type="text" id="amount_other_field" name="amount_other" size="3" onFocus="clear_radio_buttons();" onClick="update_total()" onBlur="update_total()" onChange="update_total()">
+													</td>
+												</tr>
+											{% endifequal %}
+										{% endfor %}
+									</table>
 
-                       <div class="medium-24 columns user-info">
-                            <div class="user-form">
-                                 <div class="user-input box">
-                                     <ul id="ak-errors"></ul>
+									{% if not has_products %}
+										{% if allow_monthly %}
+											<div id="type">
+												<h3 class="donate-header">Type:</h3>
 
-                                      <div style="display: none">
-                                           <div id="known_user">
-                                                Not <span id="known_user_name"></span>?  <a href="?" onclick="return actionkit.forms.logOut()">Click here.</a>
-                                           </div>
-                                      </div>
+												<div class="medium-12 columns">
+													<input type="radio" name="donation_type" value="single"{% if page.custom_fields.monthly_default %}{% else %} checked{%endif %}> One-Time
+												</div>
 
-                                      <div id="unknown_user"></div>
-                           
-                                      <div>
-                                           <div class="row">
-                                                <div class="medium-12 columns">
-                                                     <label for="first_name">First Name<span id="first_namereq" class="first_namereq req"></span>:</label> 
-                                                     <input id="first_name" type="text" name="first_name" />
-                                                </div>
+												<div class="medium-12 columns">
+													<input type="radio" name="donation_type" value="recurring"{% if page.custom_fields.monthly_default %} checked{% else %}{%endif %}> Monthly
+												</div>
+											</div>
+										{% else %}
+											<input type="hidden" name="donation_type" value="single">
+										{% endif %}
+									{% endif %}
+								</div> <!-- #amount_list -->
+							{% endif %}
+						</div> <!-- .amount -->
+					</div> <!-- .medium-24 -->
 
-                                                <div class="medium-12 columns">
-                                                     <label for="last_name">Last Name<span id="last_namereq" class="last_namereq req"></span>:</label> 
-                                                     <input id="last_name" type="text" name="last_name" />
-                                                </div>
-                                           </div> <!-- .row -->
+					<div class="medium-24 columns user-info">
+						<div class="user-form">
+							<div class="user-input box">
+								<ul id="ak-errors"></ul>
 
-                                           <div class="row">
-                                                <div class="medium-24 columns">
-                                                     <label for="address1" class="address">Street<span id="address1req" class="address1req req"></span>:</label>
-                                                     <input id="address1" type="text" name="address1" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
-                                                </div>
-                                           </div> <!-- .row -->
+								<div style="display: none">
+									<div id="known_user">
+										Not <span id="known_user_name"></span>?  <a href="?" onclick="return actionkit.forms.logOut()">Click here.</a>
+									</div>
+								</div>
+
+								<div id="unknown_user"></div>
+
+								<div>
+									<div class="row">
+										<div class="medium-12 columns">
+											<label for="first_name">First Name<span id="first_namereq" class="first_namereq req"></span>:</label> 
+											<input id="first_name" type="text" name="first_name" />
+										</div>
+
+										<div class="medium-12 columns">
+											<label for="last_name">Last Name<span id="last_namereq" class="last_namereq req"></span>:</label> 
+											<input id="last_name" type="text" name="last_name" />
+										</div>
+									</div> <!-- .row -->
+
+									<div class="row">
+										<div class="medium-24 columns">
+											<label for="address1" class="address">Street<span id="address1req" class="address1req req"></span>:</label>
+											<input id="address1" type="text" name="address1" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+										</div>
+									</div> <!-- .row -->
                                            
-                                           {% if page.allow_international %}
-                                                <div id="us_billing_fields" class="row">
-                                                     <div class="medium-12 columns">
-                                                          <label for="state" class="state-label">State<span id="statereq" class="statereq req"></span>:</label> 
-                                                          {% with 'sync_to_shipping()' as onchange %}
-                                                               {% include "./state_select.html" %}
-                                                          {% endwith %}
-                                                     </div>
+									{% if page.allow_international %}
+										<div id="us_billing_fields" class="row">
+											<div class="medium-12 columns">
+												<label for="state" class="state-label">State<span id="statereq" class="statereq req"></span>:</label> 
+												{% with 'sync_to_shipping()' as onchange %}
+													{% include "./state_select.html" %}
+												{% endwith %}
+											</div>
 
-                                                     <div class="medium-12 columns">
-                                                          <label for="zip" class="zip-label">Zip<span id="zipreq" class="zipreq req"></span>:</label>  
-                                                          <input id="zip"  type="text" name="zip" maxlength="5" size="5" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
-                                                    </div>                    
-                                                </div> <!-- #us_billing_fields .row -->
+											<div class="medium-12 columns">
+												<label for="zip" class="zip-label">Zip<span id="zipreq" class="zipreq req"></span>:</label>  
+												<input id="zip"  type="text" name="zip" maxlength="5" size="5" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+											</div>                    
+										</div> <!-- #us_billing_fields .row -->
 
-                                                <div id="intl_billing_fields" class="row">                                                  <div>
-                                                     <div class="medium-12 columns">
-                                                          <label for="state" class="state-label">Region<span id="regionreq" class="regionreq req"></span>:</label> 
-                                                          <input id="region"  type="text" name="region" size="20" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
-                                                     </div>
-                                                     
-                                                     <div class="medium-12 columns">
-                                                          <label for="postal" class="zip-label">Postal Code<span id="postalreq" class="postalreq req"></span>:</label>  
-                                                          <input id="postal"  type="text" name="postal" size="10" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
-                                                     </div>
-                                                </div> <!-- #intl_billing_fields .row -->
+										<div id="intl_billing_fields" class="row">
+											<div class="medium-12 columns">
+												<label for="state" class="state-label">Region<span id="regionreq" class="regionreq req"></span>:</label> 
+												<input id="region"  type="text" name="region" size="20" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+											</div>
 
-                                                <div class="row">
-                                                     <div class="medium-24 columns">
-                                                          <label for="state">Country<span id="countryreq" class="countryreq req"></span>:</label> 
-                                                          {% with 'country_change()' as onchange %}
-                                                               {% include "./country_select.html" %}
-                                                          {% endwith %}
-                                                     </div>
-                                                </div> <!-- .row -->
-                                            
-                                                <script language="javascript">country_change();</script>
-                                           {% else %}
-                                                <div class="row">
-                                                     <div class="medium-12 columns">
-                                                          <label for="city" class="city-label">City<span id="cityreq" class="cityreq req"></span>:</label> 
-                                                          <input id="city" type="text" name="city" onchange="sync_to_shipping()" onblur="sync_to_shipping()" />
-                                                     </div>
+											<div class="medium-12 columns">
+												<label for="postal" class="zip-label">Postal Code<span id="postalreq" class="postalreq req"></span>:</label>  
+												<input id="postal"  type="text" name="postal" size="10" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+											</div>
+										</div> <!-- #intl_billing_fields .row -->
 
-                                                     <div class="medium-6 columns">
-                                                          <label for="state" class="state-label">State<span id="statereq" class="statereq req"></span>:</label> 
-                                                          {% with 'sync_to_shipping()' as onchange %}
-                                                               {% include "./state_select.html" %}
-                                                          {% endwith %}
-                                                     </div>
+										<div class="row">
+											<div class="medium-24 columns">
+												<label for="state">Country<span id="countryreq" class="countryreq req"></span>:</label> 
+												{% with 'country_change()' as onchange %}
+													{% include "./country_select.html" %}
+												{% endwith %}
+											</div>
+										</div> <!-- .row -->
 
-                                                     <div class="medium-6 columns">
-                                                          <label for="zip" class="zip-label">Zip<span id="zipreq" class="zipreq req"></span>:</label>  
-                                                          <input id="zip"  type="text" name="zip" maxlength="5" size="5" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
-                                                    </div>                    
-                                                </div> <!-- .row -->
-                                           {% endif %}
+										<script language="javascript">country_change();</script>
+									{% else %}
+										<div class="row">
+											<div class="medium-12 columns">
+												<label for="city" class="city-label">City<span id="cityreq" class="cityreq req"></span>:</label> 
+												<input id="city" type="text" name="city" onchange="sync_to_shipping()" onblur="sync_to_shipping()" />
+											</div>
 
-                                           <div class="row">
-                                                <div class="medium-24 columns">
-                                                     <label for="email">Email<span id="emailreq" class="emailreq req"></span>:</label> 
-                                                     <input id="email" type="text" name="email" />
-                                                </div>
-                                           </div> <!-- .row -->
-                                            
-                                           <div style="clear"></div>
-                                      </div>
+											<div class="medium-6 columns">
+												<label for="state" class="state-label">State<span id="statereq" class="statereq req"></span>:</label> 
+												{% with 'sync_to_shipping()' as onchange %}
+													{% include "./state_select.html" %}
+												{% endwith %}
+											</div>
 
-                                      {% autoescape off %}
-                                           {% if page.custom_fields.custom_field %}
-                                                <div class="clear"></div>
-                                                <div class="custom_field">
-                                                     {{page.custom_fields.custom_field}}
-                                                     <div class="clear"></div>
-                                                </div>
-                                           {% endif %}
-                                      {% endautoescape %}
-                           
-                                      <input type="hidden" name="page" value="{{ page.name }}">
+											<div class="medium-6 columns">
+												<label for="zip" class="zip-label">Zip<span id="zipreq" class="zipreq req"></span>:</label>  
+												<input id="zip"  type="text" name="zip" maxlength="5" size="5" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+											</div>                    
+										</div> <!-- .row -->
+									{% endif %}
+									
+									<div class="row">
+										<div class="medium-24 columns">
+											<label for="email">Email<span id="emailreq" class="emailreq req"></span>:</label> 
+											<input id="email" type="text" name="email" />
+										</div>
+									</div> <!-- .row -->
 
-                                      <div id="shipping_address"></div>
-                            
-                                      {% if has_shippable_products %}
-                                           <hr>
-                                           <h3>Shipping Address</h3>
-                                           {% with "shipping_" as input_name_prefix %}
+									<div style="clear"></div>
+								</div>
 
-                                                <div class="row">
-                                                     <div class="medium-24 columns">
-                                                          <label for="shipping_address1">Ship to billing address:</label>
-                                                          <input id="shipping_same" type="checkbox" name="shipping_same" value="1" onchange="toggle_shipping(this)"/>
-                                                     </div>   
-                                                </div>
-                                                
-                                                <div class="row">
-                                                     <div class="medium-24 columns">   
-                                                          <label for="shipping_address1" class="address">Shipping address:</label>
-                                                          <input id="shipping_address1" type="text" name="shipping_address1" /><br>
-                                                          <input id="shipping_address2" type="text" name="shipping_address2" />
-                                                     </div>
-                                                </div>
+								{% autoescape off %}
+									{% if page.custom_fields.custom_field %}
+										<div class="clear"></div>
+								
+										<div class="custom_field">
+											{{page.custom_fields.custom_field}}
+											
+											<div class="clear"></div>
+										</div>
+									{% endif %}
+								{% endautoescape %}
 
-                                                {% if page.allow_international %}
-                                                     <div class="row">
-                                                          <div class="medium-12 columns">
-                                                               <label for="shipping_city">City:</label>
-                                                               <input id="shipping_city" type="text" name="shipping_city" />
-                                                          </div>
+								<input type="hidden" name="page" value="{{ page.name }}">
 
-                                                         <div id="us_shipping_fields">
-                                                               <div class="medium-6 columns">
-                                                                    <label for="shipping_state">State:</label>
-                                                                    {% include "./state_select.html" %}
-                                                               </div>
+								<div id="shipping_address"></div>
 
-                                                               <div class="medium-6 columns">
-                                                                    <label for="shipping_zip">Zip:</label>
-                                                                    <input id="shipping_zip"  type="text" name="shipping_zip" maxlength="5" />
-                                                               </div>
+								{% if has_shippable_products %}
+									<hr>
+										<h3>Shipping Address</h3>
 
-                                                               <div id="intl_shipping_fields">
-                                                                    <div class="medium-12 columns">
-                                                                         <label for="shipping_region">Region:</label>
-                                                                         <input id="shipping_region"  type="text" name="shipping_region" />
-                                                                    </div>
+										{% with "shipping_" as input_name_prefix %}
+											<div class="row">
+												<div class="medium-24 columns">
+													<label for="shipping_address1">Ship to billing address:</label>
+													<input id="shipping_same" type="checkbox" name="shipping_same" value="1" onchange="toggle_shipping(this)"/>
+												</div>
+											</div>
 
-                                                                    <div class="medium-12 columns">
-                                                                         <label for="shipping_postal">Postal Code:</label>
-                                                                         <input id="shipping_postal"  type="text" name="shipping_postal" />
-                                                                    </div>     
-                                                               </div>                   
-                                                          </div>
-                                                     </div>
+											<div class="row">
+												<div class="medium-24 columns">   
+													<label for="shipping_address1" class="address">Shipping address:</label>
+													<input id="shipping_address1" type="text" name="shipping_address1" /><br>
+													<input id="shipping_address2" type="text" name="shipping_address2" />
+												</div>
+											</div>
 
-                                                     <div class="row">
-                                                          <div class="medium-24 columns">
-                                                               <label for="state">Country:</label> {% with 'shipping_country_change()' as onchange %}{% include "./country_select.html" %}{% endwith %}
-                                                          </div>
+											{% if page.allow_international %}
+												<div class="row">
+													<div class="medium-12 columns">
+														<label for="shipping_city">City:</label>
+														<input id="shipping_city" type="text" name="shipping_city" />
+													</div>
 
-                                                          <script language="javascript">shipping_country_change();</script>
-                                                     </div>
-                                                {% else %}
-                                                     <div id="us_shipping_fields" class="row">
-                                                          <div class="medium-12 columns">
-                                                               <label for="shipping_city">City:</label>
-                                                               <input id="shipping_city" type="text" name="shipping_city" />
-                                                          </div>
+													<div id="us_shipping_fields">
+														<div class="medium-6 columns">
+															<label for="shipping_state">State:</label>
+															{% include "./state_select.html" %}
+														</div>
 
-                                                          <div class="medium-6 columns">
-                                                               <label for="shipping_state">State:</label>
-                                                               {% include "./state_select.html" %}
-                                                          </div>
+														<div class="medium-6 columns">
+															<label for="shipping_zip">Zip:</label>
+															<input id="shipping_zip"  type="text" name="shipping_zip" maxlength="5" />
+														</div>
 
-                                                          <div class="medium-6 columns">
-                                                               <label for="shipping_zip">Zip:</label>
-                                                               <input id="shipping_zip"  type="text" name="shipping_zip" maxlength="5" />
-                                                          </div>
-                                                     </div>                                                       
-                                                {% endif %}                                                  
-                                           {% endwith %}
-                                      {% endif %}
-                                 </div> <!-- .user_input .box -->
-                            </div> <!-- .user-form -->
-                       </div> <!-- .user-info -->
+														<div id="intl_shipping_fields">
+															<div class="medium-12 columns">
+																<label for="shipping_region">Region:</label>
+																<input id="shipping_region"  type="text" name="shipping_region" />
+															</div>
 
-                       <div class="medium-24 columns cc-info">
-                            <div class="payment-form">
-                                 <div class="row">
-                                      <div class="medium-24 columns">
-                                           <label for="card_num">Credit Card Number:</label>
-                                           <input id="card_num" type="text" name="card_num" />
-                                      </div>
-                                 </div> <!-- .row -->
+															<div class="medium-12 columns">
+																<label for="shipping_postal">Postal Code:</label>
+																<input id="shipping_postal"  type="text" name="shipping_postal" />
+															</div>
+														</div>
+													</div>
+												</div>
 
-                                 <div class="row">
-                                      <div class="medium-12 columns">
-                                           <label for="exp_date">Expiration Date:</label>
+												<div class="row">
+													<div class="medium-24 columns">
+														<label for="state">Country:</label> {% with 'shipping_country_change()' as onchange %}{% include "./country_select.html" %}{% endwith %}
+													</div>
 
-                                           <div class="row">
-                                                <div class="small-12 columns">                    
-                                                     <select id="exp_date_month" type="text" name="exp_date_month">
-                                                          <option value=""></option>
-                                                          <option value="01">01</option>
-                                                          <option value="02">02</option>
-                                                          <option value="03">03</option>
-                                                          <option value="04">04</option>
-                                                          <option value="05">05</option>
-                                                          <option value="06">06</option>
-                                                          <option value="07">07</option>
-                                                          <option value="08">08</option>
-                                                          <option value="09">09</option>
-                                                          <option value="10">10</option>
-                                                          <option value="11">11</option>
-                                                          <option value="12">12</option>
-                                                     </select>
-                                                </div>
+													<script language="javascript">shipping_country_change();</script>
+												</div>
+											{% else %}
+												<div id="us_shipping_fields" class="row">
+													<div class="medium-12 columns">
+														<label for="shipping_city">City:</label>
+														<input id="shipping_city" type="text" name="shipping_city" />
+													</div>
 
-                                                <div class="small-12 columns">
-                                                     <select id="exp_date_year" type="text" name="exp_date_year">
-                                                          <option value=""></option>
-                                                          <option value="13">2013</option>
-                                                          <option value="14">2014</option>
-                                                          <option value="15">2015</option>
-                                                          <option value="16">2016</option>
-                                                          <option value="17">2017</option>
-                                                          <option value="18">2018</option>
-                                                          <option value="19">2019</option>
-                                                          <option value="20">2020</option>
-                                                          <option value="21">2021</option>
-                                                          <option value="22">2022</option>
-                                                          <option value="23">2023</option>
-                                                          <option value="24">2024</option>
-                                                          <option value="25">2025</option>
-                                                     </select>                     
-                                                </div>                        
-                                           </div> <!-- .row -->
-                                      </div>
+													<div class="medium-6 columns">
+														<label for="shipping_state">State:</label>
+														{% include "./state_select.html" %}
+													</div>
 
-                                      <div class="medium-12 columns">
-                                           <label for="card_code">Verification Number:</label>
-                                           <input id="card_code" type="text" name="card_code" size="4" />
-                                      </div>
-                                </div> <!-- .row --> 
-                           </div> 
-                       </div>
+													<div class="medium-6 columns">
+														<label for="shipping_zip">Zip:</label>
+														<input id="shipping_zip"  type="text" name="shipping_zip" maxlength="5" />
+													</div>
+												</div>   
+											{% endif %}       
+										{% endwith %}
+									{% endif %}
+								</div> <!-- .user_input .box -->
+							</div> <!-- .user-form -->
+						</div> <!-- .user-info -->
 
-                       <div class="small-24 submit-button columns">
-                            {% if page.payment_processor_information.use_cse %}
-                                 {% if page.custom_fields.submit_button_text %}
-                                      <input type="submit" class="button alert" disabled="true" value="{{page.custom_fields.submit_button_text}}" />
-                                 {% else %}
-                                      <input class="button alert" disabled="true" type="submit" value="Submit Donation">
-                                 {% endif %}
-                                 
-                                 <noscript>
-                                      <p><b>JavaScript is required</b> so this page can securely submit your donation.</p>
-                                 </noscript>
+						{% if show_paypal %}
+							<div class="payment-method medium-24 columns">
+								<div class="row">
+									<div class="medium-12 columns">
+										<input type="radio" name="paypal" value="0" id="pay_by_cc" checked> 
+										<label for="pay_by_cc" class="button">Pay with Credit Card</label>
+									</div>
 
-                            {% else %}
-                                 {% if page.custom_fields.submit_button_text %}
-                                      <input type="submit" class="button alert" value="{{page.custom_fields.submit_button_text}}" />
-                                 {% else %}
-                                      <input class="button alert" type="submit" value="Submit Donation">
-                                 {% endif %}
-                            {% endif %}
+									<div class="medium-12 columns">
+										<input type="radio" name="paypal" value="1" id="pay_by_paypal">
+										<label for="pay_by_paypal" style="display: inline;">
+											<img style="max-width: 150px" src="https://www.paypalobjects.com/webstatic/mktg/merchant/images/express-checkout-hero.png">
+										</label>
+									</div>
+								</div>
+							</div>
+						{% endif %}
 
-                            <div>{% include "./progress_meter.html" %}</div>
-                       </div>
-                  </div>
-             </form>
-   </div> <!-- page-form -->
+						<div class="medium-24 columns cc-info">
+							<div class="payment-form">
+								<div class="row">
+									<div class="medium-24 columns">
+										<label for="card_num">Credit Card Number:</label>
+										<input id="card_num" type="text" name="card_num" />
+									</div>
+								</div> <!-- .row -->
 
-	<div class="small-24 medium-12 medium-pull-11 medium-offset-1 columns page-text">
-		{% include_tmpl form.ask_text %}
-	</div> <!-- page-text -->
-	{% comment %}
-		/*
-			---------------------------------------------------------------
-				END - Classic Layout Donation Form - Markup
-			---------------------------------------------------------------
-		*/
-	{% endcomment %}
+								<div class="row">
+									<div class="medium-12 columns">
+										<label for="exp_date">Expiration Date:</label>
+
+										<div class="row">
+											<div class="small-12 columns">                    
+												<select id="exp_date_month" type="text" name="exp_date_month">
+													<option value=""></option>
+													<option value="01">01</option>
+													<option value="02">02</option>
+													<option value="03">03</option>
+													<option value="04">04</option>
+													<option value="05">05</option>
+													<option value="06">06</option>
+													<option value="07">07</option>
+													<option value="08">08</option>
+													<option value="09">09</option>
+													<option value="10">10</option>
+													<option value="11">11</option>
+													<option value="12">12</option>
+												</select>
+											</div>
+
+											<div class="small-12 columns">
+												<select id="exp_date_year" type="text" name="exp_date_year">
+													<option value=""></option>
+													<option value="13">2013</option>
+													<option value="14">2014</option>
+													<option value="15">2015</option>
+													<option value="16">2016</option>
+													<option value="17">2017</option>
+													<option value="18">2018</option>
+													<option value="19">2019</option>
+													<option value="20">2020</option>
+													<option value="21">2021</option>
+													<option value="22">2022</option>
+													<option value="23">2023</option>
+													<option value="24">2024</option>
+													<option value="25">2025</option>
+												</select>                     
+											</div>                  
+										</div> <!-- .row -->
+									</div>
+
+									<div class="medium-12 columns">
+										<label for="card_code">Verification Number:</label>
+										<input id="card_code" type="text" name="card_code" size="4" />
+									</div>
+								</div> <!-- .row --> 
+							</div>
+						</div>
+
+						<div class="small-24 submit-button columns">
+							{% if page.payment_processor_information.use_cse %}
+								{% if page.custom_fields.submit_button_text %}
+									<input type="submit" class="button alert" disabled="true" value="{{page.custom_fields.submit_button_text}}" />
+								{% else %}
+									<input class="button alert" disabled="true" type="submit" value="Submit Donation">
+								{% endif %}
+
+								<noscript>
+									<p><b>JavaScript is required</b> so this page can securely submit your donation.</p>
+								</noscript>
+							{% else %}
+								{% if page.custom_fields.submit_button_text %}
+									<input type="submit" class="button alert" value="{{page.custom_fields.submit_button_text}}" />
+								{% else %}
+									<input class="button alert" type="submit" value="Submit Donation">
+								{% endif %}
+							{% endif %}
+
+							<div>{% include "./progress_meter.html" %}</div>
+						</div>
+					</div>
+				</form>
+			</div> <!-- page-form -->
+
+			<div class="small-24 medium-12 medium-pull-11 medium-offset-1 columns page-text">
+				{% include_tmpl form.ask_text %}
+			</div> <!-- page-text -->
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+	@END - Classic Layout Donation Form - Markup
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
 {% endif %}
 {% endblock %}
 

@@ -40,7 +40,17 @@
 <h2> Your Recurring Donations </h2>
 <ul>
 {% for profile in recurring_donations %}
-<li>{{ profile.amt }} a {{ profile.inverse_period_display|lower }}, started on {{ profile.created_at|date:"m/d/Y" }}. You've given a total of {{ profile.payment_total_amt }}. {% if profile.is_active %}<a href="/cms/pledge/update/update/">Update your credit card</a> or <a href="/cms/pledge/cancel/monthly/">cancel at any time.</a> {% else %} <b>{{ profile.get_status_display }} on {{ profile.updated_at|date:"m/d/Y" }} </b>{% endif %}
+<li>{{ profile.amt }} a {{ profile.inverse_period_display|lower }}, started on {{ profile.created_at|date:"m/d/Y" }}. 
+You've given a total of {{ profile.payment_total_amt }}. 
+{% if profile.is_active %}
+  {% if profile.order.payment_method != "paypal" %}
+    <a href="/cms/pledge/update/update/">Update your credit card</a> or <a href="/cms/pledge/cancel/monthly/">cancel at any time.</a>
+  {% else %}
+    <a href="/cms/pledge/cancel/monthly/">Cancel at any time.</a>
+  {% endif %} 
+{% else %}
+  <b>{{ profile.get_status_display }} on {{ profile.updated_at|date:"m/d/Y" }} </b>
+{% endif %}
 {% endfor %}
 </ul>
 {% endif %}

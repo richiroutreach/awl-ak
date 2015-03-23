@@ -23,7 +23,7 @@
 	{% field_order name email prefix first_name middle_name last_name suffix country address1 address2 city state zip region postal phone %}
 	{% hide_by_default prefix first_name middle_name last_name suffix country phone address1 address2 city state region postal %}
 
-	{% for field in fields %}
+	{% for field in user_fields %}
 		<div class="{% if field|is_in:context.required %}required{% endif %}" id="id_{{ field }}_box">
 			{% comment %}
 				<label for="id_{{ field }}">{{ field|ak_field_label:field|capfirst }}{% if field|is_in:context.required %}<span class="ak-required-flag">*</span>{% endif %}</label>
@@ -35,7 +35,12 @@
 				{% case 'state' %}
 					{% include "./state_select.html" %}
 				{% else %}
-					<input name="{{ field }}" id="id_{{ field }}" type="text" placeholder="{{ field|ak_field_label:field|capfirst }}">
+					<input name="{{ field.field_name }}" id="id_{{ field.field_name }}" type="text" placeholder="{{ field.label_text }}">
+
+					{% comment %}
+					{{ field.input_tag }}
+					
+					{% endcomment %}
 			{% endswitch %}
 		</div>
 	{% endfor %}

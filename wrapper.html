@@ -21,12 +21,16 @@
 
 	<script>startTime=new Date()</script>
 
-	{% if form.id %}
-		<meta name="description" property="og:description" content="{% block description %}{{ page.custom_fields.description|default:form.intro|striptags }}{% endblock %}">
+	{% if page.custom_fields.fb_share_text %}
+			<meta name="description" property="og:description" content="{{ page.custom_fields.fb_share_text }}">		
+	{% else %}
+		{% if form.id %}
+			<meta name="description" property="og:description" content="{% block description %}{{ page.custom_fields.description|default:form.intro|striptags }}{% endblock %}">
+		{% endif %}
 	{% endif %}
 
-	{% if page.custom_fields.image %}
-		<meta property="og:image" content="{{ page.custom_fields.image }}">
+	{% if page.custom_fields.fb_share_image %}
+		<meta property="og:image" content="{{ page.custom_fields.fb_share_image}}">
 	{% endif %}
 
 	{% block meta_additions %}{% endblock %}
@@ -50,6 +54,12 @@
 
 	<!-- Share Progress -->
 	<script src="//c.shpg.org/44/sp.js"></script>
+
+	<!-- jQuery Cookie Plugin -->
+	<script src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/js/jquery.cookie.js"></script>
+
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 
 	{% block script_additions %}{% endblock %}
 </head>
@@ -274,6 +284,89 @@
 			}
 		</style>
 	{% endif %}
+
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+	@START - GA Event Tracking
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
+
+	<script>
+		// Global Variable to tell if AK knows who the visitor is or not
+		var knownUser = {% if user.email %}true{% else %}false{% endif %};
+
+		$(document).ready(function() {
+			// Send GA Event Tracking Info
+			ga('send', 'event', 'View', 'Template Used', 'Foundation Templateset');
+
+			ga('send', 'event', 'View', 'Type', '{{ page.type }}');
+
+			// Determine if we are on the thank you page or not
+			{% if filename|split:'.'|nth:0 == "thanks" %}
+				ga('send', 'event', 'View', 'Step', 'Completed ({{ page.type }})');
+				ga('send', 'event', 'View', 'Step', 'Completed ({{ page.id }})');
+
+				if(knownUser) {
+					ga('send', 'event', 'View', 'User', 'Completed ({{ user.email }} on {{ page.id }})');
+				} else {
+					ga('send', 'event', 'View', 'User', 'Completed (Unknown User on {{ page.id }})');
+				}
+			{% else %}
+				ga('send', 'event', 'View', 'Step', 'Ask ({{ page.type }})');
+				ga('send', 'event', 'View', 'Step', 'Ask ({{ page.id }})');
+
+				if(knownUser) {
+					ga('send', 'event', 'View', 'User', 'Ask ({{ user.email }} on {{ page.id }})');
+				} else {
+					ga('send', 'event', 'View', 'User', 'Ask (Unknown User on {{ page.id }})');				
+				}
+			{% endif %}
+
+			// See if this user has visited the site before
+			if(typeof $.cookie('user') !== 'undefined') {
+				{% if filename|split:'.'|nth:0 == "thanks" %}
+					ga('send', 'event', 'Cookie', 'View', 'Completed (' + $.cookie('user') + ' on {{ page.id }})');
+					ga('send', 'event', 'Cookie', $.cookie('user'), 'Completed ({{ page.id }})');
+				{% else %}
+					ga('send', 'event', 'Cookie', 'View', 'Ask (' + $.cookie('user') + ' on {{ page.id }})');
+					ga('send', 'event', 'Cookie', $.cookie('user'), 'Ask ({{ page.id }})');
+				{% endif %}
+			}
+
+			// See if the current user has visited this page before
+			{% if filename|split:'.'|nth:0 == "thanks" %}
+				if(typeof $.cookie('thanks-{{ page.id }}') === 'undefined') {
+					ga('send', 'event', 'Cookie', 'View', 'Unique Completed ({{ page.id }})');
+					$.cookie('thanks-{{ page.id }}', 'yes', { expires: 365, path: '/' });
+				}
+			{% else %}
+				if(typeof $.cookie('ask-{{ page.id }}') === 'undefined') {
+					ga('send', 'event', 'Cookie', 'View', 'Unique Ask ({{ page.id }})');
+					$.cookie('ask-{{ page.id }}', 'yes', { expires: 365, path: '/' });
+				}
+			{% endif %}
+
+			// Add the email cookie on form submit
+			$('#act').submit(function() {
+				if(typeof $.cookie('user') === 'undefined') {
+					if(knownUser) {
+						$.cookie('user', '{{ user.email }}', { expires: 365,  path: '/' });
+					} else if ( $('#email').val() != "" ) {
+						$.cookie('user', $('#email').val(), { expires: 365, path: '/'});
+					}
+				}
+			});
+		});
+	</script>
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+	@END - GA Event Tracking
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}	
 </body>
 <!-- @END wrapper.html -->
 </html>

@@ -3,132 +3,121 @@
 {% block meta_additions %}<meta property="og:url" value="{{ page.canonical_url }}">{% endblock %}
 
 {% block content %}
-     <!-- @START thanks.html -->
+	<!-- @START thanks.html -->
 
-     {% autoescape off %}
-          {% if actionkit_user %}
-               {% if recurring_update or recurring_cancel %}
-                    <p class="area">
-                         {% filter ak_text:"logged_in_as" %}You are logged in as{% endfilter %} {{ actionkit_user.name }}. <a href="/logout">{% filter ak_text:"logout" %}Click to log out.{% endfilter %}</a>
-                    </p>
-               {% endif %}
-          {% endif %}
+	{% autoescape off %}
+		{% if actionkit_user %}
+			{% if recurring_update or recurring_cancel %}
+				<p class="area">
+					{% filter ak_text:"logged_in_as" %}You are logged in as{% endfilter %} {{ actionkit_user.name }}. <a href="/logout">{% filter ak_text:"logout" %}Click to log out.{% endfilter %}</a>
+				</p>
+			{% endif %}
+		{% endif %}
 
-          {% if page.followup.send_taf and args.taf %}
-               <form name="taf" method="POST" action="/update_action/" accept-charset="utf-8" class="thank-you-form{% if page.custom_fields.shareprogress %} shareprogress{% endif %}">
-                    <div class="page-title medium-24 columns">
-                         {% if page.custom_fields.thank_you_header_text %}
-                              <h2>{{ page.custom_fields.thank_you_header_text }}</h2>
-                         {% else %}
-                              <h2>You're almost done! <span class="ak-mobile-only">&#10003;</span></h2>
-                         {% endif %}
+		{% if page.followup.send_taf and args.taf %}
+			<form name="taf" method="POST" action="/update_action/" accept-charset="utf-8" class="thank-you-form{% if page.custom_fields.shareprogress %} shareprogress{% endif %}">
+				<div class="page-title medium-24 columns">
+					{% if page.custom_fields.thank_you_header_text %}
+						<h2>{{ page.custom_fields.thank_you_header_text }}</h2>
+					{% else %}
+						<h2>You're almost done! <span class="ak-mobile-only">&#10003;</span></h2>
+					{% endif %}
 
-                         {% comment %}
-                              {% include './social_plugins.html' %}
-                         {% endcomment %}
-                    </div> <!-- .page-title -->
+					{% comment %}
+						{% include './social_plugins.html' %}
+					{% endcomment %}
+				</div> <!-- .page-title -->
 
-                    <div class="page-text medium-24 columns">
-                         {% filter ak_text:"tell_your_friends_banner" %}
-                              {% if page.custom_fields.shareprogress %}
-                                   <p class="ak-blurb"> {% include_tmpl form.thank_you_text %}</p>
+				<div class="page-text medium-14 columns">
+					{% filter ak_text:"tell_your_friends_banner" %}
+						{% if page.custom_fields.shareprogress %}
+							<p class="ak-blurb"> {% include_tmpl form.thank_you_text %}</p>
 
-                                   <div id="sp_share_page" page_url="{{page.canonical_url}}"></div>
-                              {% else %}
-                                   <p class="ak-blurb">{% include_tmpl form.thank_you_text %} Now you can <span class="ak-emphasized-text">multiply your impact</span> by spreading the word.</p>
-                              {% endif %}
-                         {% endfilter %}
-                    </div> <!-- .top-text -->
+							<div id="sp_share_page" page_url="{{page.canonical_url}}"></div>
+						{% else %}
+							<p class="ak-blurb">{% include_tmpl form.thank_you_text %} Now you can <span class="ak-emphasized-text">multiply your impact</span> by spreading the word.</p>
+						{% endif %}
+					{% endfilter %}
+				</div> <!-- .top-text -->
 
-                    <input type="hidden" name="page" value="{{ page.name }}">
+				<input type="hidden" name="page" value="{{ page.name }}">
 
-                    <div class="medium-9 columns taf-buttons">
-                         <div class="ak-sharebox">
-                              <span class="ak-facebook-text ak-hidden-mobile"></span><span class="ak-hidden-mobile">Tell your friends on Facebook:</span>
-          
-                              <a href="https://www.facebook.com/sharer/sharer.php?u={{ page.canonical_url }}" class="fb-button button" target="_blank">Post to Facebook &raquo;</a>
-                         </div> <!-- .sharebox -->
+				<div class="medium-10 columns taf-buttons">
+					<div class="ak-sharebox">
+						<div class="row">
+							<div class="large-3 columns taf-icon">
+								<i class="fa fa-envelope-square"></i>
+							</div> <!-- .taf-icon -->
 
-                         <div class="ak-sharebox clear">
-                              <span class="ak-twitter-text ak-hidden-mobile"></span><span class="ak-hidden-mobile"> Tell your friends on twitter:</span>
-     
-                              <a class="button tw-button" href="http://twitter.com/share?url={{ page.canonical_url }}&text={{ page.title }}" target="_blank">Share on Twitter &raquo;</a>
+							<div class="large-19 columns">
+								 <a href="mailto:?subject={{ page.followup.taf_subject|urlencode }}&amp;body={{ page.followup.taf_body|referring_akid:akid|tag_links:"source=mailto"|urlencode }}" class="ak-email ak-share-button" target="_blank">{% filter ak_text:"taf_mailto_ask" %}Email your friends &raquo;{% endfilter %}</a>
 
-                              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+								<div class="taf-text">Click the above to open your email browser, or copy and paste the message below into an email message.</div>
 
-                         </div> <!-- .sharebox -->
+<textarea class="ak-share-message" row="10">
+Subject: {{ page.title }}
 
-                         <div class="ak-sharebox ak-hidden-mobile">
-                              {% include "./progress_meter.html" %}
-                         </div>
-                    </div> <!-- .taf-buttons -->
+{% filter referring_akid:akid|tag_links:"source=taf" %}{% include_tmpl page.followup.taf_body escaped %}{% endfilter %}
 
-                    <div class="medium-15 columns email-share">
-                         <div class='ak-sharebox ak-padding-left-none'>
-                              <div class="ak-hidden-mobile email-ask">Send a message to your friends!</div>
-                              
-                              <a href="mailto:?subject={{ page.followup.taf_subject|urlencode }}&body={{ page.followup.taf_body|referring_akid:akid|tag_links:"source=mailto"|urlencode }}" class="ak-email ak-share-button button" target="_blank">{% filter ak_text:"taf_mailto_ask" %}Send an email now &raquo;{% endfilter %}</a>
+</textarea>
+							</div> <!-- .large-18 columns -->
+						</div> <!-- .row -->
+					</div> <!-- .ak-sharebox -->
 
-                              {% comment %}
-                              <div>Or copy and paste the text below into an email message:</div>
+					<div class="ak-sharebox">
+						<div class="row">
+							<div class="large-3 columns taf-icon">
+								<i class="fa fa-facebook-square"></i>
+							</div> <!-- .taf-icon -->	
 
-                              <textarea class="ak-share-message">
-                                   Subject: {{ page.title }}
+							<div class="large-19 columns">
+								<a href="https://www.facebook.com/sharer/sharer.php?u={{ page.canonical_url }}" class="fb-button" target="_blank">Share on Facebook &raquo;</a>
 
-                                   {% filter referring_akid:akid|tag_links:"source=taf" %}{% include_tmpl page.followup.taf_body escaped %}{% endfilter %}
-                              
-                              Thanks!</textarea>
-                              {% endcomment %}
-                         </div> <!-- .aksharebox -->
-                         
-                         <div class='ak-sharebox'>
-                              <div id="taf" class="ak-percent-full">
-                                   <div id="ak-confirmation">
-                                        {% filter ak_text:"taf_confirmation" %}Sent!  If you like, you can send more messages below.{% endfilter %}
-                                   </div><!--akconfirmation-->
+								{% if page.custom_fields.fb_share_image %}
+									<div class="row">
+										<div class="large-10 columns">
+											<img src="{{ page.custom_fields.fb_share_image }}" />
+										</div>
 
-                                   <div id="taf-preview" class="taf-preview last col ak-percent-full ak-padding-left-none ak-hidden-mobile">
-                                        <a class="wide ak-emailalt" for="id_taf_body">{% filter ak_field_label:"taf_preview" %}Or, send a message using our site!{% endfilter %}</a>
+										<div class="small-taf-text large-14 columns">
+											Click above to share this action on Facebook
+										</div>
+									</div>
+								{% else %}
+									<div class="small-taf-text">
+										Click above to share this action on Facebook
+									</div>
+								{% endif %}
+							</div>
+						</div>
+					</div> <!-- .sharebox -->
 
-                                        <div id="taf-form" class="col ak-errs-below ak-labels-overlaid ak-percent-full ak-hide ak-padding-left-none">
-                                             <div class="ak-blurb bold ak-emphasized-text">To: </div>
-                              
-                                             <div class="ak-labels-overlaid">
-                                                  <label class="wide" for="id_taf_emails">
-                                                       {% filter ak_text:"taf_ask" %}{% endfilter %} Enter email addresses separated by commas
-                                                  </label>       
+					<div class="ak-sharebox clear">
+						<div class="row">
+							<div class="large-3 columns taf-icon">
+								<i class="fa fa-twitter-square"></i>
+							</div> <!-- .taf-icon -->					
+						
+							<div class="large-19 columns">
+								{% if page.custom_fields.share_tweet %}
+									<a class="tw-button" href="http://twitter.com/share?url={{ page.canonical_url }}&text={{ page.custom_fields.share_tweet }}" target="_blank">Tweet this action &raquo;</a>
+								{% else %}
+									<a class="tw-button" href="http://twitter.com/share?url={{ page.canonical_url }}&text={{ page.title }}" target="_blank">Tweet this action &raquo;</a>
+								{% endif %}
 
-                                                  <textarea id="id_taf_emails" name="taf_emails" class="ak-sharebox-tafsubject"></textarea>
-                                             </div>
-                                        </div> <!-- .tafform -->
+								<div class="small-taf-text">Click above to tweet this link.</div>
 
-                                        <div class="ak-blurb bold ak-emphasized-text">Subject: </div>
+								<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+							</div>
+						</div>
+					</div> <!-- .sharebox -->
 
-                                        <div class="taf_subject">
-                                             <label id="lbl_taf_subject" for="id_taf_subject"></label>
-                                             <div id="id_taf_subject" class="ak-sharebox-tafsubject">{% include_tmpl page.followup.taf_subject escaped %}</div>
-                                        </div> <!-- .tafsubject -->
-
-                                        <div class="ak-blurb bold ak-emphasized-text">Body: </div>
-
-                                        <div id="id_taf_body" name="taf_body" class="ak-sharebox-tafbody">
-                                             {% filter referring_akid:akid|tag_links:"source=taf" %}{% include_tmpl page.followup.taf_body escaped %}{% endfilter %}
-                                        </div>
-
-                                        <div class="ak-blurb bold ak-emphasized-text">Personal message: </div>
-
-                                        <div class="ak-labels-overlaid">
-                                             <label for="id_taf_note">Add a short note (optional)</label>
-                                             <textarea id="id_taf_note" name="taf_note"></textarea>
-                                        </div>
-
-                                        <button type="submit" class="ak-sendmessage ak-share-button">{% filter ak_text:"taf_send_messages" %}Send message &raquo;{% endfilter %}</button>
-                                   </div> <!-- .tafpreview -->
-
-                                   <input type="hidden" name="required" value="taf_emails">
-                              </div>
-                         </div>
-                    </div> <!-- .email-share -->
+					{% if page.goal %}
+						<div class="ak-sharebox ak-hidden-mobile">
+							{% include "./progress_meter.html" %}
+						</div>
+					{% endif %}
+				</div> <!-- .taf-buttons -->
                </form>
 
                <script type="text/javascript">
@@ -183,8 +172,12 @@
 
                                    <div class="ak-sharebox clear">
                                         <span class="ak-twitter-text ak-hidden-mobile"></span><span class="ak-hidden-mobile"> Tell your friends on twitter:</span>
-               
-                                        <a class="button tw-button" href="http://twitter.com/share?url={{ page.canonical_url }}&text={{ page.title }}" target="_blank">Share on Twitter &raquo;</a>
+               	
+				               	{% if page.custom_fields.share_tweet %}
+									<a class="button tw-button" href="http://twitter.com/share?url={{ page.canonical_url }}&amp;text={{ page.custom_fields.share_tweet }}" target="_blank">Share on Twitter &raquo;</a>
+								{% else %}
+									<a class="button tw-button" href="http://twitter.com/share?url={{ page.canonical_url }}&amp;text={{ page.title }}" target="_blank">Share on Twitter &raquo;</a>
+								{% endif %}
 
                                         <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 

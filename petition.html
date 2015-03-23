@@ -3,82 +3,80 @@
 {% load actionkit_tags %}
 
 {% block content %}
-<!-- @START petition.html -->
+	<!-- @START petition.html -->
 
-<div class="medium-24 columns page-title">
-     <h2>{{ page.title }}</h2>
-</div>
+	<div class="medium-24 columns page-title">
+		<h2>{{ page.title }}</h2>
+	</div>
 
+	<form class="ak-form" name="act" method="POST" action="/act/" accept-charset="utf-8">
+		<input type="hidden" name="page" value="{{ page.name }}">
 
-<form class="ak-form" name="act" method="POST" action="/act/" accept-charset="utf-8">
-     <input type="hidden" name="page" value="{{ page.name }}">
+		<div class="medium-9 medium-push-14 columns right-column">
+			<div class="form-pretext">
+				{% if page.custom_fields.custom_form_title %}
+					{% include_tmpl page.custom_fields.custom_form_title %}
+				{% else %}
+					Send a letter!
+				{% endif %}
+			</div>
 
-     <div class="medium-9 medium-push-14 columns right-column">
-          <div class="form-pretext">
-               {% if page.custom_fields.custom_form_title %}
-                    {{ page.custom_fields.custom_form_title }}
-               {% else %}
-                    Send a letter!
-               {% endif %}
-          </div>
+			<div class="petition-form">
+				<div class="statement-text">
+					{% include_tmpl form.statement_text %}
+				</div> <!-- .statement-text -->
 
-          <div class="petition-form">
-               <div class="statement-text">
-                    {% include_tmpl form.statement_text %}
-               </div> <!-- .statement-text -->
+				{% include "./user_form_wrapper.html" %}
 
-               {% include "./user_form_wrapper.html" %}
+				<div class="ak-field">
+					<!--<label class="wide" for="id_comment">Comment</label>-->
+					<textarea id="id_comment" name="action_comment" placeholder="Comment"></textarea>
+				</div>
 
-               <div class="ak-field">
-                    <!--<label class="wide" for="id_comment">Comment</label>-->
-                    <textarea id="id_comment" name="action_comment" placeholder="Comment"></textarea>
-               </div>
-               
-               {% include "./progress_meter.html" %}
+				{% include "./progress_meter.html" %}
 
-               <div class="submit-button">
-                    <button type="submit">{% if page.custom_fields.submit_button_text %}{{ page.custom_fields.submit_button_text }}{% else %}Sign{% endif %}</button>          
-               </div> <!-- .submit-button -->
+				<div class="submit-button">
+					<button type="submit">{% if page.custom_fields.submit_button_text %}{{ page.custom_fields.submit_button_text }}{% else %}Sign{% endif %}</button>
+				</div> <!-- .submit-button -->
 
-               <div class="signup-notice">
+				<div class="signup-notice">
 					When you take action you will be signed up for periodic email alerts and communications from Alaska Wilderness League.
-               </div> <!-- .signup-notice -->
+				</div> <!-- .signup-notice -->
 
-               {% include "./inline_tellafriend.html" %}
-          </div> <!-- .petition-form -->
-     </div> <!-- .medium-9 -->
+				{% include "./inline_tellafriend.html" %}
+			</div> <!-- .petition-form -->
+		</div> <!-- .medium-9 -->
 
-     <div class="medium-13 medium-offset-1 medium-pull-9 columns left-column about-text">
-          {% if form.statement_leadin %}
-               <div class="lead-in">
-                    {% include_tmpl form.statement_leadin %}
-               </div> <!-- .petition-to -->
-          {% endif %}              
+		<div class="medium-13 medium-offset-1 medium-pull-9 columns left-column about-text">
+			{% if form.statement_leadin %}
+				<div class="lead-in">
+					{% include_tmpl form.statement_leadin %}
+				</div> <!-- .petition-to -->
+			{% endif %}
 
-          {% autoescape off %}
-               <div>{% include_tmpl form.about_text %}</div>
-          {% endautoescape %} 
-     </div> <!-- .about-text -->
-</form>
-
-
-<script>
-     $(document).ready(function() {
-          $('.statement-text p:first-child').css("display", "block");
-          $('.statement-text p:nth-child(2)').css("display", "block");
-
-          if($('.statement-text p').length > 2) {
-               $('.statement-text p:nth-child(2)').append("<a class='read-more' style='display: block;'> Read More...</a>");
-          }
-
-          $('.read-more').click(function() {
-               $('.read-more').fadeOut(250).hide();
-
-               $('.statement-text p').fadeIn(250);
-          });
-     });
-</script>
+			{% autoescape off %}
+				<div>{% include_tmpl form.about_text %}</div>
+			{% endautoescape %} 
+		</div> <!-- .about-text -->
+	</form>
 
 
-<!-- @END petition.html -->
+	<script>
+		$(document).ready(function() {
+			$('.statement-text p:first-child').css("display", "block");
+			$('.statement-text p:nth-child(2)').css("display", "block");
+
+			if($('.statement-text p').length > 2) {
+				$('.statement-text p:nth-child(2)').append("<a class='read-more' style='display: block;'> Read More...</a>");
+			}
+
+			$('.read-more').click(function() {
+				$('.read-more').fadeOut(250).hide();
+
+				$('.statement-text p').fadeIn(250);
+			});
+		});
+	</script>
+
+	<!-- @END petition.html -->
 {% endblock %}
