@@ -284,7 +284,62 @@
 			}
 		</style>
 	{% endif %}
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+	@START - TAF Tracking
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
+	<script>
+		$( document ).ready( function() {
+			// Try to load the TAF information from the URL
+			var urlData = getURLParameter( 'data' );
 
+			// Try to load the AK provided information
+			var akid = getURLParameter( 'referring_akid');
+
+			// Variables to hold the source and referrer
+			var actionSource = "";
+			var actionReferrer = "";
+
+			// Did we find the data parameter?
+			if( urlData != null ) {
+				// Split the information on the -
+				urlData = urlData.split( '-' );
+			
+				actionSource = urlData[1];
+				actionReferrer = urlData[0];
+			
+			// Did we find a referral AKID in the url?
+			} else if ( akid != null ) {
+				// Set the source
+				actionSource = getURLParameter( 'source' );
+
+				// Split the AKID into it's three parts
+				akid = akid.split( '.' );
+
+				// We only care about the user ID, the middle part
+				actionReferrer = akid[1];
+			} 
+
+			// Add the hidden fields to the form with the correct data
+			$( 'form[name="act"]' ).append( '<input name="action_source" type="hidden" value="' + actionSource + '">' ).append(
+				'<input name="action_referrer" type="hidden" value="' + actionReferrer + '">'
+			);
+		});
+
+		function getURLParameter(name) {
+			return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+		}
+	</script>
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+	@END - TAF Tracking
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
 {% comment %}
 	/*
 -------------------------------------------------------------------------------

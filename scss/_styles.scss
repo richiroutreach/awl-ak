@@ -813,7 +813,18 @@ input[type="submit"], button[type="submit"] {
 	--------------------------------------------------------------------------
 */
 
+body.thanks-page {
+	background: white;
+}
+
 .thanks-page {
+	.thank-you-image {
+		img {
+			min-width: 95%;
+			margin: 1rem auto;
+		}
+	}
+
 	.social-links {
 		.facebook-share-button {
 			height: 20px;
@@ -1006,6 +1017,51 @@ ul#ak-errors {
 
 .donation-total h3 {
 	color: $orange;
+}
+
+.payment-method {
+	text-align: center;
+
+	label {
+		background: transparent;
+		padding: 5px;
+		width: 100%;
+
+		span {
+			display: block;
+			width: 100%;
+		}
+	}
+
+	input[type="radio"] {
+		display: none;
+
+		&:checked + label {
+			background: darken( $orange, 10 );
+		}
+
+		&:checked + label.paypal {
+			background: #003087;
+		}
+	}
+
+	.button.small {
+		padding: 0.5rem;
+		font-size: 1.25rem;
+		margin: 0;
+		}
+	}
+
+	.paypal {
+		& span {
+			background-color: #009cde;
+		}
+
+		&:hover {
+			span {
+				background-color: #003087;
+			}
+		}
 }
 
 
@@ -1576,6 +1632,7 @@ ul#ak-errors {
 
 	.progress-holder {
 		margin-bottom: 0.5rem;
+		margin-top: 1rem;
 		background: white;
 		border: 2px solid $teal;
 		position: relative;

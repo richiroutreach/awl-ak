@@ -289,16 +289,19 @@
 			
 			$("input[type='radio']").click(function() {
 				if ($("#pay_by_cc").is(':checked')) {
-					$(".ak-cc-box").slideDown();
+					$(".payment-form").slideDown();
+					$('.type-wrapper').slideDown();
 				}
 
 				if ($("#pay_by_paypal").is(':checked')) {
-					$(".ak-cc-box").slideUp();
+					$(".payment-form").slideUp();
+					$('input[name="donation_type"][value="single"]').prop("checked", true);
+					$('.type-wrapper').slideUp();
 				}
 			}); 
 
 			if ($("#pay_by_cc").is(':checked')) {
-				$(".ak-cc-box").show()
+				$(".payment-form").show()
 			}
 		}
 
@@ -1490,12 +1493,14 @@
 											<div id="type">
 												<h3 class="donate-header">Type:</h3>
 
-												<div class="medium-12 columns">
-													<input type="radio" name="donation_type" value="single"{% if page.custom_fields.monthly_default %}{% else %} checked{%endif %}> One-Time
-												</div>
+												<div class="type-wrapper">
+													<div class="medium-12 columns">
+														<input type="radio" name="donation_type" value="single"{% if page.custom_fields.monthly_default %}{% else %} checked{%endif %}> One-Time
+													</div>
 
-												<div class="medium-12 columns">
-													<input type="radio" name="donation_type" value="recurring"{% if page.custom_fields.monthly_default %} checked{% else %}{%endif %}> Monthly
+													<div class="medium-12 columns">
+														<input type="radio" name="donation_type" value="recurring"{% if page.custom_fields.monthly_default %} checked{% else %}{%endif %}> Monthly
+													</div>
 												</div>
 											</div>
 										{% else %}
@@ -1506,6 +1511,22 @@
 							{% endif %}
 						</div> <!-- .amount -->
 					</div> <!-- .medium-24 -->
+
+					{% if show_paypal %}
+						<div class="payment-method medium-24 columns">
+							<div class="row">
+								<div class="medium-12 columns">
+									<input type="radio" name="paypal" value="0" id="pay_by_cc" checked> 
+									<label for="pay_by_cc"><span class="button small">Credit Card</span></label>
+								</div>
+
+								<div class="medium-12 columns">
+									<input type="radio" name="paypal" value="1" id="pay_by_paypal">
+									<label for="pay_by_paypal" class="paypal"><span class="button small">PayPal</span></label>
+								</div>
+							</div>
+						</div>
+					{% endif %}
 
 					<div class="medium-24 columns user-info">
 						<div class="user-form">
@@ -1706,24 +1727,6 @@
 								</div> <!-- .user_input .box -->
 							</div> <!-- .user-form -->
 						</div> <!-- .user-info -->
-
-						{% if show_paypal %}
-							<div class="payment-method medium-24 columns">
-								<div class="row">
-									<div class="medium-12 columns">
-										<input type="radio" name="paypal" value="0" id="pay_by_cc" checked> 
-										<label for="pay_by_cc" class="button">Pay with Credit Card</label>
-									</div>
-
-									<div class="medium-12 columns">
-										<input type="radio" name="paypal" value="1" id="pay_by_paypal">
-										<label for="pay_by_paypal" style="display: inline;">
-											<img style="max-width: 150px" src="https://www.paypalobjects.com/webstatic/mktg/merchant/images/express-checkout-hero.png">
-										</label>
-									</div>
-								</div>
-							</div>
-						{% endif %}
 
 						<div class="medium-24 columns cc-info">
 							<div class="payment-form">
