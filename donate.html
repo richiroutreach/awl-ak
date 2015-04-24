@@ -1053,13 +1053,19 @@
 
 						{% if not has_products %}
 							{% if allow_monthly %}
-								<div id="type" class="row type-wrapper">
-									<div class="small-12 {% if page.custom_fields.donation_template_3 %}medium-6 {% else %}medium-12 {% endif %}columns">
-										<input type="radio" name="donation_type" value="single" checked> One-Time
+								<div id="type" class="row">
+									<div class="type-wrapper">
+										<div class="small-12 {% if page.custom_fields.donation_template_3 %}medium-6 {% else %}medium-12 {% endif %}columns">
+											<input type="radio" name="donation_type" value="single" checked> One-Time
+										</div>
+
+										<div class="small-12 {% if page.custom_fields.donation_template_3 %}medium-6 {% else %}medium-12 {% endif %}columns">
+											<input type="radio" name="donation_type" value="recurring"> Monthly
+										</div>
 									</div>
 
-									<div class="small-12 {% if page.custom_fields.donation_template_3 %}medium-6 {% else %}medium-12 {% endif %}columns">
-										<input type="radio" name="donation_type" value="recurring"> Monthly
+									<div class="hidden medium-24 columns paypal-type-notification">
+										PayPal is only avaliable for one time donations
 									</div>
 								</div>
 							{% else %}
@@ -1183,6 +1189,7 @@
 								<div class="medium-24 columns">
 									<label for="email"><span id="emailreq" class="emailreq req"></span>Email:</label> 
 									<input id="email" type="text" name="email" />
+									<input type="hidden" name="required" value="email"/>
 
 									<div class="subscription-notice">
 										If you donate now and are not already a member, you will receive periodic email communications from Alaska Wilderness League.
@@ -1460,7 +1467,11 @@
 														<input type="radio" name="donation_type" value="recurring"{% if page.custom_fields.monthly_default %} checked{% else %}{%endif %}> Monthly
 													</div>
 												</div>
-											</div>
+
+												<div class="hidden medium-24 columns paypal-type-notification">
+													PayPal is only avaliable for one time donations
+												</div>
+											</div>										
 										{% else %}
 											<input type="hidden" name="donation_type" value="single">
 										{% endif %}
@@ -1581,6 +1592,7 @@
 										<div class="medium-24 columns">
 											<label for="email">Email<span id="emailreq" class="emailreq req"></span>:</label> 
 											<input id="email" type="text" name="email" />
+											<input type="hidden" name="required" value="email"/>
 										</div>
 									</div> <!-- .row -->
 
@@ -1809,6 +1821,7 @@
 
 				if ($("#pay_by_cc").is(':checked')) {
 					$(".payment-form").slideDown();
+					$('.paypal-type-notification').slideUp();
 					$('.type-wrapper').slideDown();
 				}
 
@@ -1816,6 +1829,7 @@
 					$(".payment-form").slideUp();
 					$('input[name="donation_type"][value="single"]').prop("checked", true);
 					$('.type-wrapper').slideUp();
+					$('.paypal-type-notification').slideDown();
 				}
 			}); 
 		
