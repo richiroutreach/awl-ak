@@ -58,7 +58,7 @@
 							</div> <!-- .taf-icon -->
 
 							<div class="large-19 columns">
-								<a href="mailto:?subject={{ page.followup.taf_subject|urlencode }}&body={{ page.followup.taf_body|referring_akid:akid|tag_links:'source=mailto'|urlencode }}" class="button alert" target="_blank">{% filter ak_text:"taf_mailto_ask" %}Email your friends &raquo;{% endfilter %}</a>
+								<a href="mailto:?subject={{ page.followup.taf_subject|urlencode}}&amp;body={% filter referring_akid:akid|tag_links:"source=mailto"|urlencode %}{% include_tmpl page.followup.taf_body escaped %}{% endfilter %}" class="button alert" target="_blank">{% filter ak_text:"taf_mailto_ask" %}Email your friends &raquo;{% endfilter %}</a>
 
 								<div class="taf-text">Click the above to open your email browser, or copy and paste the message below into an email message.</div>
 

@@ -30,7 +30,7 @@
 	font-family: 'MuseoSans-900';
 	src: url('https://s3.amazonaws.com/s3.alaskawild.org/foundation/fonts/2B3FB1_0_0.eot');
 	src: url('https://s3.amazonaws.com/s3.alaskawild.org/foundation/fonts/2B3FB1_0_0.eot?#iefix') format('embedded-opentype'),
-		url('https://s3.amazonaws.com/s3.alaskawild.org/foundation/fonts/2B3FB1_0_0.woff') format('woff'),
+		url('https://s3.amazonaws.com/s3.alaskawild.org/foundation/fonts/2B3F77B1_0_0.woff') format('woff'),
 		url('https://s3.amazonaws.com/s3.alaskawild.org/foundation/fonts/2B3FB1_0_0.ttf') format('truetype');
 }
 
@@ -1145,6 +1145,11 @@ ul#ak-errors {
 		}
 	}
 */
+	.payment-method {
+		margin-bottom: 2rem;
+		margin-top: 1rem;
+	}
+
 	.req {
 		color: red;
 	}
@@ -1185,10 +1190,14 @@ ul#ak-errors {
 
 	#type {
 		background: #e6e6e6;
-		margin-bottom: 2rem;
+		margin-bottom: 1rem;
 
 		div:last-child {
 			float: left;
+		}
+
+		input[type="radio"] {
+			margin-bottom: 0;
 		}
 
 		@media #{$small-only} {

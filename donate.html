@@ -265,59 +265,6 @@
 		}, 500);
 	});
 </script>
-
-{% comment %}
-	/*
--------------------------------------------------------------------------------
-		@START - PayPal Integration Script
--------------------------------------------------------------------------------
-	*/
-{% endcomment %}
-{% if show_paypal %}
-	<script>
-		function submit_paypal() {
-			/* clear out CC info if entered */
-			$('#card_num').val('');
-			$('#card_code').val('');
-
-			/* and keep submitting */
-			return True;
-		}
-
-		function paypalradios() {
-			$(".ak-cc-box").addClass('ak-hide');
-			
-			$("input[type='radio']").click(function() {
-				if ($("#pay_by_cc").is(':checked')) {
-					$(".payment-form").slideDown();
-					$('.type-wrapper').slideDown();
-				}
-
-				if ($("#pay_by_paypal").is(':checked')) {
-					$(".payment-form").slideUp();
-					$('input[name="donation_type"][value="single"]').prop("checked", true);
-					$('.type-wrapper').slideUp();
-				}
-			}); 
-
-			if ($("#pay_by_cc").is(':checked')) {
-				$(".payment-form").show()
-			}
-		}
-
-		$(document).ready(function() {
-			paypalradios();
-		});
-	</script>
-{% endif %}
-{% comment %}
-	/*
--------------------------------------------------------------------------------
-		@END - PayPal Integration Script
--------------------------------------------------------------------------------
-	*/
-{% endcomment %}
-
 {% comment %}
 	/*
 -------------------------------------------------------------------------------
@@ -1106,7 +1053,7 @@
 
 						{% if not has_products %}
 							{% if allow_monthly %}
-								<div id="type" class="row">
+								<div id="type" class="row type-wrapper">
 									<div class="small-12 {% if page.custom_fields.donation_template_3 %}medium-6 {% else %}medium-12 {% endif %}columns">
 										<input type="radio" name="donation_type" value="single" checked> One-Time
 									</div>
@@ -1121,6 +1068,23 @@
 						{% endif %}
 					{% endif %}
 				</div> <!-- .amounts -->
+
+				{% if show_paypal %}
+					<div class="payment-method medium-24 columns">
+						<div class="row">
+							<div class="medium-12 columns">
+								<input type="radio" name="paypal" value="0" id="pay_by_cc" checked> 
+								<label for="pay_by_cc" class="type-button"><span class="button small">Credit Card</span></label>
+							</div>
+
+							<div class="medium-12 columns">
+								<input type="radio" name="paypal" value="1" id="pay_by_paypal">
+								<label for="pay_by_paypal" class="type-button paypal"><span class="button small">PayPal</span></label>
+							</div>
+						</div>
+					</div>
+				{% endif %}
+
 
 				{% if page.custom_fields.donation_template_2 %}
 						</div> <!-- .row -->
@@ -1245,7 +1209,7 @@
 					</div><!-- .user_input -->
 				</div> <!-- .user-form -->
 
-				<div class="payment-form medium-12 columns">
+				<div class="medium-12 cc-info columns">
 					<div class="payment-form">
 						<div class="row">
 							<div class="medium-24 columns">
@@ -1325,14 +1289,6 @@
 							{% endif %}
 						</div> <!-- .submit-button -->                    
 
-						{% if not page.custom_fields.disable_paypal %}
-							<div class="small-24 medium-12 columns paypal">
-								<a id="paypal-button" class="button">
-									<span class="paypal-small">Donate with</span><span class="paypal-large">PayPal</span>
-								</a>
-							</div> <!-- .paypal -->
-						{% endif %}
-
 						<div class="medium-24 columns form-instructions">
 							Click only once to process your donation.<br/><br/>
 							<span class="req">*</span>&nbsp;Indicates required field<br/><br/>
@@ -1345,14 +1301,16 @@
 
 							{% include "./progress_meter.html" %}
 
+							{% comment %}
 							<div class="security-seals">
 								<!-- GeoTrust QuickSSL [tm] Smart  Icon tag. Do not edit. -->
 									<script language="javascript" type="text/javascript" src="//smarticon.geotrust.com/si.js"></script>
 								<!-- end  GeoTrust Smart Icon tag -->
 							</div> <!-- .security-seals -->
+							{% endcomment %}
 						</div> <!-- .form-instructions -->
 					</div> <!-- .row -->                    
-				</div> <!-- .payment-form -->
+				</div> <!-- .cc-info -->
 			</div> <!-- .row -->
 		</form>
 
@@ -1825,6 +1783,62 @@
 	*/
 {% endcomment %}
 {% endif %}
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+		@START - PayPal Integration Script
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
+{% if show_paypal %}
+	<script>
+		function submit_paypal() {
+			/* clear out CC info if entered */
+			$('#card_num').val('');
+			$('#card_code').val('');
+
+			/* and keep submitting */
+			return True;
+		}
+
+		function paypalradios() {
+			$(".ak-cc-box").addClass('ak-hide');
+
+			$( "input[type='radio'][name='paypal']").click(function() {
+				console.log('click');
+
+				if ($("#pay_by_cc").is(':checked')) {
+					$(".payment-form").slideDown();
+					$('.type-wrapper').slideDown();
+				}
+
+				if ($("#pay_by_paypal").is(':checked')) {
+					$(".payment-form").slideUp();
+					$('input[name="donation_type"][value="single"]').prop("checked", true);
+					$('.type-wrapper').slideUp();
+				}
+			}); 
+		
+			if ($("#pay_by_cc").is(':checked')) {
+				$(".payment-form").show()
+			}
+		}
+/*
+		$(document).ready(function() {
+			paypalradios();
+		});
+*/
+		paypalradios();
+
+	</script>
+{% endif %}
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+		@END - PayPal Integration Script
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
 {% endblock %}
 
 {% if pp.use_cse %}
