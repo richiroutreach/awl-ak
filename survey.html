@@ -23,14 +23,14 @@
 				{% if page.custom_fields.custom_form_title %}{{ page.custom_fields.custom_form_title }}{% else %}Take Our Survey!{% endif %}
 			</div>
 
-			{% if not page.custom_fields.wide_survey %}
+			{% if not page.custom_fields.wide_survey and not page.custom_fields.survey_questions_first %}
 				{% include "./user_form_wrapper.html" %}
 			{% endif %}
 
 
 			<div id="survey-questions" class="survey-questions">
 				{% autoescape off %}
-					{% if page.custom_fields.wide_survey %}
+					{% if page.custom_fields.wide_survey and not page.custom_fields.survey_questions_first %}
 						<div class="row">
 							<div class="medium-24 columns">
 								{% include "./user_form_wrapper.html" %}
@@ -52,8 +52,20 @@
 							</div> <!-- .row -->
 						{% endif %}
 					{% endfor %}
+
+					{% if page.custom_fields.wide_survey and page.custom_fields.survey_questions_first %}
+						<div class="row">
+							<div class="medium-24 columns">
+								{% include "./user_form_wrapper.html" %}
+							</div>
+						</div>
+					{% endif %}
 				{% endautoescape %}
 			</div> <!-- .survey-questions -->
+
+			{% if not page.custom_fields.wide_survey and page.custom_fields.survey_questions_first %}
+				{% include "./user_form_wrapper.html" %}
+			{% endif %}
 
 			<div class="submit-button">
 				<button type="submit">{% if page.custom_fields.submit_button_text %}{{ page.custom_fields.submit_button_text }}{% else %}Submit{% endif %}</button>
@@ -66,7 +78,7 @@
 			<div class="medium-13 medium-offset-1 medium-pull-9 columns about-text">
 				{% autoescape off %}
 					<div>{% include_tmpl form.introduction_text %}</div>
-				{% endautoescape %} 
+				{% endautoescape %}
 			</div> <!-- .about-text -->
 		{% endif %}
 	</form>

@@ -29,6 +29,8 @@
 		{% endif %}
 	{% endif %}
 
+	<meta property="og:url" content="{{ page.canonical_url }}">
+
 	{% if page.custom_fields.fb_share_image %}
 		<meta property="og:image" content="{{ page.custom_fields.fb_share_image}}">
 	{% endif %}
@@ -64,7 +66,7 @@
 	{% block script_additions %}{% endblock %}
 </head>
 
-<body class="{{ filename|split:'.'|nth:0 }}-page lang-{{page.lang.iso_code|default:"unknown"}}{% if page.lang.is_rtl %} ak-rtl{% endif %} ak-no-js">
+<body class="{{ filename|split:'.'|nth:0 }}-page lang-{{page.lang.iso_code|default:"unknown"}}{% if page.lang.is_rtl %} ak-rtl{% endif %} ak-no-js {{ page.name}}">
 	<script type="text/javascript">actionkit.forms.initPage()</script>
 
 	<div class="container">

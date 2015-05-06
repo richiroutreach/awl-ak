@@ -14,7 +14,7 @@
 			{% endif %}
 		{% endif %}
 
-		{% if page.followup.send_taf and args.taf %}
+		{% if page.followup.send_taf and args.taf or page.custom_fields.force_share_buttons %}
 			<form name="taf" method="POST" action="/update_action/" accept-charset="utf-8" class="thank-you-form{% if page.custom_fields.shareprogress %} shareprogress{% endif %}">
 				<div class="page-title medium-24 columns">
 					{% if page.custom_fields.thank_you_header_text %}
@@ -33,129 +33,141 @@
 						{% if page.custom_fields.shareprogress %}
 							<div class="ak-blurb">{% include_tmpl form.thank_you_text %}</div>
 
-							<div id="sp_share_page" page_url="{{page.canonical_url}}"></div>
+							{% if page.custom_fields.thank_you_page_image %}
+								<img src="{{ page.custom_fields.thank_you_page_image }}" />
+							{% else %}
+								<img src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/img/spreadtheword2.gif" />
+							{% endif %}
+
 						{% else %}
-							<p class="ak-blurb">{% include_tmpl form.thank_you_text %} Now you can <span class="ak-emphasized-text">multiply your impact</span> by spreading the word.</p>
+							<p class="ak-blurb">{% include_tmpl form.thank_you_text %}</p>
 						{% endif %}
 					{% endfilter %}
 
-					<div class="thank-you-image hide-for-small">
-						{% if page.custom_fields.thank_you_page_image %}
-							<img src="{{ page.custom_fields.thank_you_page_image }}" />
-						{% else %}
-							<img src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/img/spreadtheword2.gif" />
-						{% endif %}
-					</div> <!-- .thank-you-image -->
+					{% if page.custom_fields.shareprogress %}
+					{% else %}
+						<div class="thank-you-image hide-for-small">
+							{% if page.custom_fields.thank_you_page_image %}
+								<img src="{{ page.custom_fields.thank_you_page_image }}" />
+							{% else %}
+								<img src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/img/spreadtheword2.gif" />
+							{% endif %}
+						</div> <!-- .thank-you-image -->
+					{% endif %}
  				</div> <!-- .top-text -->
 
 				<input type="hidden" name="page" value="{{ page.name }}">
 
-				<div class="medium-10 columns taf-buttons">
-					<div class="ak-sharebox">
-						<div class="row">
-							<div class="large-3 columns taf-icon">
-								<i class="fa fa-envelope-square"></i>
-							</div> <!-- .taf-icon -->
+				{% if page.custom_fields.shareprogress %}
+					<div class="medium-10 columns">
+						<div id="sp_share_page" page_url="{{page.canonical_url}}"></div>
+					</div>
+				{% else %}
+					<div class="medium-10 columns taf-buttons">
+						<div class="ak-sharebox">
+							<div class="row">
+								<div class="large-3 columns taf-icon">
+									<i class="fa fa-envelope-square"></i>
+								</div> <!-- .taf-icon -->
 
-							<div class="large-19 columns">
-								<a href="mailto:?subject={{ page.followup.taf_subject|urlencode}}&amp;body={% filter referring_akid:akid|tag_links:"source=mailto"|urlencode %}{% include_tmpl page.followup.taf_body escaped %}{% endfilter %}" class="button alert" target="_blank">{% filter ak_text:"taf_mailto_ask" %}Email your friends &raquo;{% endfilter %}</a>
+								<div class="large-19 columns">
+									<a href="mailto:?subject={{ page.followup.taf_subject|urlencode}}&amp;body={% filter referring_akid:akid|tag_links:"source=mailto"|urlencode %}{% include_tmpl page.followup.taf_body escaped %}{% endfilter %}" class="" target="_blank">{% filter ak_text:"taf_mailto_ask" %}Email your friends &raquo;{% endfilter %}</a>
 
-								<div class="taf-text">Click the above to open your email browser, or copy and paste the message below into an email message.</div>
-
+									<div class="taf-text">Click the above to open your email browser, or copy and paste the message below into an email message.</div>
 <textarea class="ak-share-message" row="10">
 Subject: {{ page.title }}
 
 {% filter referring_akid:akid|tag_links:"source=tafemail" %}{% include_tmpl page.followup.taf_body escaped %}{% endfilter %}
 
 </textarea>
-							</div> <!-- .large-18 columns -->
-						</div> <!-- .row -->
-					</div> <!-- .ak-sharebox -->
+								</div> <!-- .large-18 columns -->
+							</div> <!-- .row -->
+						</div> <!-- .ak-sharebox -->
 
-					<div class="ak-sharebox">
-						<div class="row">
-							<div class="large-3 columns taf-icon">
-								<i class="fa fa-facebook-square"></i>
-							</div> <!-- .taf-icon -->	
+						<div class="ak-sharebox">
+							<div class="row">
+								<div class="large-3 columns taf-icon">
+									<i class="fa fa-facebook-square"></i>
+								</div> <!-- .taf-icon -->	
 
-							<div class="large-19 columns">
-								<a href="https://www.facebook.com/sharer/sharer.php?u={{ page.canonical_url }}?data={{ user.id }}-facebook" class="fb-button" target="_blank">Share on Facebook &raquo;</a>
+								<div class="large-19 columns">
+									<a href="https://www.facebook.com/sharer/sharer.php?u={{ page.canonical_url }}?data={{ user.id }}-facebook" class="fb-button" target="_blank">Share on Facebook &raquo;</a>
 
-								{% if page.custom_fields.fb_share_image %}
-									<div class="row">
-										<div class="large-10 columns">
-											<img src="{{ page.custom_fields.fb_share_image }}" />
+									{% if page.custom_fields.fb_share_image %}
+										<div class="row">
+											<div class="large-10 columns">
+												<img src="{{ page.custom_fields.fb_share_image }}" />
+											</div>
+
+											<div class="small-taf-text large-14 columns">
+												{% if page.custom_fields.fb_share_text %}
+													{{ page.custom_fields.fb_share_text }}
+												{% else %}
+													Click above to share this action on Facebook
+												{% endif %}
+											</div>
 										</div>
-
-										<div class="small-taf-text large-14 columns">
+									{% else %}
+										<div class="small-taf-text">
 											{% if page.custom_fields.fb_share_text %}
 												{{ page.custom_fields.fb_share_text }}
 											{% else %}
 												Click above to share this action on Facebook
 											{% endif %}
 										</div>
-									</div>
-								{% else %}
-									<div class="small-taf-text">
-										{% if page.custom_fields.fb_share_text %}
-											{{ page.custom_fields.fb_share_text }}
-										{% else %}
-											Click above to share this action on Facebook
-										{% endif %}
-									</div>
-								{% endif %}
-							</div>
-						</div>
-					</div> <!-- .sharebox -->
-
-					<div class="ak-sharebox clear">
-						<div class="row">
-							<div class="large-3 columns taf-icon">
-								<i class="fa fa-twitter-square"></i>
-							</div> <!-- .taf-icon -->					
-						
-							<div class="large-19 columns">
-								{% if page.custom_fields.share_tweet %}
-									<a class="tw-button" href="http://twitter.com/share?url={{ page.canonical_url }}?data={{ user.id }}-twitter&text={{ page.custom_fields.share_tweet }}" target="_blank">Tweet this action &raquo;</a>
-								{% else %}
-									<a class="tw-button" href="http://twitter.com/share?url={{ page.canonical_url }}?data={{ user.id }}-twitter&text={{ page.title }}" target="_blank">Tweet this action &raquo;</a>
-								{% endif %}
-
-								<div class="small-taf-text">
-									{% if page.custom_fields.share_tweet %}
-										{{ page.custom_fields.share_tweet }}
-									{% else %}
-										Click above to tweet this link.
 									{% endif %}
 								</div>
-
-								<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 							</div>
-						</div>
-					</div> <!-- .sharebox -->
+						</div> <!-- .sharebox -->
 
-					{% if page.goal %}
-						<div class="ak-sharebox ak-hidden-mobile">
-							{% include "./progress_meter.html" %}
-						</div>
-					{% endif %}
-				</div> <!-- .taf-buttons -->
-               </form>
+						<div class="ak-sharebox clear">
+							<div class="row">
+								<div class="large-3 columns taf-icon">
+									<i class="fa fa-twitter-square"></i>
+								</div> <!-- .taf-icon -->
+							
+								<div class="large-19 columns">
+									{% if page.custom_fields.share_tweet %}
+										<a class="tw-button" href="http://twitter.com/share?url={% if page.custom_fields.twitter_share_url %}{{ page.custom_fields.twitter_share_url }}{% else %}{{ page.canonical_url }}{% endif %}?data={{ user.id }}-twitter&text={{ page.custom_fields.share_tweet|urlencode }}" target="_blank">Tweet this action &raquo;</a>
+									{% else %}
+										<a class="tw-button" href="http://twitter.com/share?url={% if page.custom_fields.twitter_share_url %}{{ page.custom_fields.twitter_share_url }}{% else %}{{ page.canonical_url }}{% endif %}?data={{ user.id }}-twitter&text={{ page.title }}" target="_blank">Tweet this action &raquo;</a>
+									{% endif %}
 
-               <script type="text/javascript">
-                    if (actionkit.args.taf) { 
-                         $("#taf").show();
-                    }
+									<div class="small-taf-text">
+										{% if page.custom_fields.share_tweet %}
+											{{ page.custom_fields.share_tweet }}
+										{% else %}
+											Click above to tweet this link.
+										{% endif %}
+									</div>
 
-                    $(document).ready(function() {
-                         $('.ak-emailalt').click(function() {
-                              $('#taf-form').slideToggle();
-                         });
-                    });
-               </script>
+									<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+								</div>
+							</div>
+						</div> <!-- .sharebox -->
 
-          {% else %}
+						{% if page.goal %}
+							<div class="ak-sharebox ak-hidden-mobile">
+								{% include "./progress_meter.html" %}
+							</div>
+						{% endif %}
+					</div> <!-- .taf-buttons -->
+				{% endif %}
+			</form>
 
+           <script type="text/javascript">
+                if (actionkit.args.taf) { 
+                     $("#taf").show();
+                }
+
+                $(document).ready(function() {
+                     $('.ak-emailalt').click(function() {
+                          $('#taf-form').slideToggle();
+                     });
+                });
+           </script>
+
+		{% else %}
                {% comment %}
                     What's below shows if either the person used the tell-a-friend feature integrated into petitions, etc., or if the page has tell-a-friend turned off entirely. You can use this space to push people to take some other action (donate after signing a petition, say). You can also use {% if page.followup.send_taf %} here to show different content for pages that have tellafriend versus those that don't.
                {% endcomment %}
@@ -236,13 +248,13 @@ Subject: {{ page.title }}
 										<div class="row">
 											<div class="large-3 columns taf-icon">
 												<i class="fa fa-twitter-square"></i>
-											</div> <!-- .taf-icon -->					
+											</div> <!-- .taf-icon -->
 										
 											<div class="large-19 columns">
 												{% if page.custom_fields.share_tweet %}
-													<a class="tw-button" href="http://twitter.com/share?url={{ page.canonical_url }}?data={{ user.id }}-twitter&text={{ page.custom_fields.share_tweet }}" target="_blank">Tweet this action &raquo;</a>
+													<a class="tw-button" href="http://twitter.com/share?url={% if page.custom_fields.twitter_share_url %}{{ custom_fields.twitter_share_url }}{% else %}{{ page.canonical_url }}{% endif %}?data={{ user.id }}-twitter&text={{ page.custom_fields.share_tweet }}" target="_blank">Tweet this action &raquo;</a>
 												{% else %}
-													<a class="tw-button" href="http://twitter.com/share?url={{ page.canonical_url }}?data={{ user.id }}-twitter&text={{ page.title }}" target="_blank">Tweet this action &raquo;</a>
+													<a class="tw-button" href="http://twitter.com/share?url={% if page.custom_fields.twitter_share_url %}{{ custom_fields.twitter_share_url }}{% else %}{{ page.canonical_url }}{% endif %}?data={{ user.id }}-twitter&text={{ page.title }}" target="_blank">Tweet this action &raquo;</a>
 												{% endif %}
 
 												<div class="small-taf-text">
@@ -297,7 +309,6 @@ Subject: {{ page.title }}
                <p>Your email(s) have been sent!</p>
                 <a class="close-reveal-modal">&#215;</a>
           </div>
-
      {% endautoescape %}
 
      <script>

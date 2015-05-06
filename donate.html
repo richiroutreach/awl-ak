@@ -1078,12 +1078,12 @@
 				{% if show_paypal %}
 					<div class="payment-method medium-24 columns">
 						<div class="row">
-							<div class="medium-12 columns">
+							<div class="medium-12 columns cc">
 								<input type="radio" name="paypal" value="0" id="pay_by_cc" checked> 
 								<label for="pay_by_cc" class="type-button"><span class="button small">Credit Card</span></label>
 							</div>
 
-							<div class="medium-12 columns">
+							<div class="medium-12 columns paypal">
 								<input type="radio" name="paypal" value="1" id="pay_by_paypal">
 								<label for="pay_by_paypal" class="type-button paypal"><span class="button small">PayPal</span></label>
 							</div>
@@ -1484,12 +1484,12 @@
 					{% if show_paypal %}
 						<div class="payment-method medium-24 columns">
 							<div class="row">
-								<div class="medium-12 columns">
+								<div class="medium-12 columns cc">
 									<input type="radio" name="paypal" value="0" id="pay_by_cc" checked> 
 									<label for="pay_by_cc"><span class="button small">Credit Card</span></label>
 								</div>
 
-								<div class="medium-12 columns">
+								<div class="medium-12 columns paypal">
 									<input type="radio" name="paypal" value="1" id="pay_by_paypal">
 									<label for="pay_by_paypal" class="paypal"><span class="button small">PayPal</span></label>
 								</div>
@@ -1836,6 +1836,15 @@
 			if ($("#pay_by_cc").is(':checked')) {
 				$(".payment-form").show()
 			}
+
+			$( 'input[name="donation_type"]' ).click( function() {
+				if( $(this).val() == "recurring" ) {
+					$( '.payment-method .paypal' ).fadeOut( 300 );
+					$( '#pay_by_cc' ).click();
+				} else {
+					$( '.payment-method .paypal' ).fadeIn( 300 );
+				}
+			});
 		}
 /*
 		$(document).ready(function() {
