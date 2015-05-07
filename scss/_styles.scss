@@ -46,6 +46,8 @@ $lightTeal: #e7edf0;
 $red: #FF0000;
 $offBrown: #BBB2B5;
 $errorColor: #BB0011;
+$white: #ffffff;
+$black: #000000;
 
 // Social Media color
 $fbColor: #3b5998;
@@ -1737,12 +1739,12 @@ ul#ak-errors {
 
 	.checkbox {
 		.fa-circle-o {
-			color: #888;
+			color: $black; //#888888;
 		}
 
 		.fa-check {
 			display: none;
-			color: #888;
+			color: $black; //#888888;
 		}
 	}
 
@@ -1758,23 +1760,52 @@ ul#ak-errors {
 			transition: 600ms;
 		}
 
+		&:active {
+			img {
+				width: 75%;
+				border-color: $teal;
+			}
+		}
+
 		&:hover {
+
 			img {
 				-webkit-filter: none;
 				-moz-filter: none;
 				filter: none;
+				border-color: $teal;
 			}
 		}
 	}
 
 	.fact-popup {
-		position: absolute;
-		width: 200px;
-		background: white;		
-		padding: 0.25rem;
+		-webkit-box-shadow: 2px 12px 8px #222222;
+		-moz-box-shadow: 2px 12px 8px #222222;
+		box-shadow: 2px 12px 8px #222222;
+		border-radius: 5px;
+		position: absolute;	
 		font-size: 0.75rem;
+		background: white;
 		text-align: left;
+		padding: 1rem;
+		width: 200px;
+		top: -187px;
 		z-index: 99;
+
+		&:after {
+			top: 100%;
+			left: 50%;
+			border: solid transparent;
+			content: " ";
+			height: 0;
+			width: 0;
+			position: absolute;
+			pointer-events: none;
+			border-color: rgba(255, 255, 255, 0);
+			border-top-color: $white;
+			border-width: 20px;
+			margin-left: -20px;
+		}
 
 		h3 {
 			font-size: 1.15rem;
@@ -1786,8 +1817,15 @@ ul#ak-errors {
 		em {
 			color: $teal;
 			font-weight: bold;
+			font-style: normal;
 			text-transform: uppercase;
 			padding-right: 0.5rem;
 		}
 	}
+}
+
+.wide-survey .survey-questions .row label {
+	color: $black;
+	font-weight: bold;
+	text-transform: uppercase;
 }
