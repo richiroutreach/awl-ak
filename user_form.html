@@ -24,7 +24,7 @@
 	{% hide_by_default prefix first_name middle_name last_name suffix country phone address1 address2 city state region postal %}
 
 	{% for field in user_fields %}
-		<div class="{% if field|is_in:context.required %}required{% endif %}" id="id_{{ field }}_box">
+		<div class="{% if field|is_in:context.required %}required{% endif %} field-wrapper" id="id_{{ field }}_box">
 			{% comment %}
 				<label for="id_{{ field }}">{{ field|ak_field_label:field|capfirst }}{% if field|is_in:context.required %}<span class="ak-required-flag">*</span>{% endif %}</label>
 			{% endcomment %}

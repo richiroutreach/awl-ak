@@ -44,8 +44,38 @@
 						{% endif %}
 					{% endfilter %}
 
+					{% if page.custom_fields.furry_feud %}
+						<div class="row furry-feud-results">
+							<div class="medium-12 columns hunters">
+								<h3>Hunters</h3>
+
+								<canvas id="hunters-poll" width="200" height="200"></canvas>
+							</div>
+
+							<div class="medium-12 columns flyers">
+								<h3>Flyers</h3>
+
+								<canvas id="flyers-poll" width="200" height="200"></canvas>
+							</div>
+						</div>
+
+						<div class="row furry-feud-results">
+							<div class="medium-12 columns gentle-giants">
+								<h3>Gentle Giants</h3>
+
+								<canvas id="gentle_giants-poll" width="200" height="200"></canvas>
+							</div>
+
+							<div class="medium-12 columns swimmers">
+								<h3>Swimmers</h3>
+
+								<canvas id="swimmers-poll" width="200" height="200"></canvas>
+							</div>
+						</div>						
+					{% endif %}
+
 					{% if page.custom_fields.shareprogress %}
-					{% else %}
+					{% elif not page.custom_fields.furry_feud %}
 						<div class="thank-you-image hide-for-small">
 							{% if page.custom_fields.thank_you_page_image %}
 								<img src="{{ page.custom_fields.thank_you_page_image }}" />
@@ -325,7 +355,120 @@ Subject: {{ page.title }}
           });
      </script>
 
-     <!-- @END thanks.html -->
+	{% if page.custom_fields.furry_feud %}
+		<script src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/js/Chart.min.js"></script>
+
+		<script>
+			// Hold our external requests
+			var requests = [];
+
+			// Turn machine names into nice names
+			var animals = {
+				polar_bear: "Polar Bear",
+				gray_wolf: "Gray Wolf",
+				arctic_fox: "Arctic Fox",
+
+				snowy_owl: "Snowy Owl",
+				arctic_tern: "Arctic Tern",
+				bald_eagle: "Bald Eagle",
+
+				caribou: "Caribou",
+				moose: "Moose",
+				muskox: "Muskox",
+
+				walrus: "Walrus",
+				beluga_whale: "Beluga Whale",
+				ringed_seal: "Ringed Seal"
+			};
+/*
+			var colors = {
+				polar_bear: '#f57b20',  
+				gray_wolf: '#815343',
+				arctic_fox: '#2893ac',
+
+				snowy_owl: '#f57b20',
+				arctic_tern: '#815343',
+				bald_eagle: '#2893ac',
+
+				caribou: '#f57b20',
+				moose: '#815343',
+				muskox: '#2893ac',
+
+				walrus: '#f57b20',
+				beluga_whale: '#815343', 
+				ringed_seal: '#2893ac'		
+			};
+*/
+			var colors = {
+				hunters: '#f57b20',
+				flyers: '#f57b20',  
+				gentle_giants: '#815343',
+				swimmers: '#2893ac'
+			}
+
+			// Hold our poll data
+			var data = {
+				labels: [],
+				datasets: []
+			};
+
+			$( document ).ready( function() {
+				drawPoll( 'hunters' );
+			});
+
+			function drawPoll( bracket ) {
+				// Hold the total number of values
+				var total;
+
+				// Push onto our requests array so we can execute these requests later
+				requests.push(
+					$.getJSON( 'http://www.alaskawild.org/furry-feud/' + bracket + '.php', function( response ) {
+						var dataset = { 
+							label: 'Votes', 
+							data: [],
+							fillColor: colors[ bracket ],
+							strokeColor: shadeColor( colors[ bracket ], 0.25),
+							highlightFill: shadeColor( colors[ bracket ], 0.25),
+							highlightStroke: shadeColor( colors[ bracket ], 0.25) 
+						};
+
+						$.each( response, function( label, value ) {
+							data.labels.push( animals[ label ] );
+							dataset.data.push( value );
+						});
+					
+						data.datasets.push( dataset );
+					})
+				);
+
+				// Only do this when all of our requests are done
+				$.when.apply(null, requests).done(function() {
+					// Shortcut for where the poll will go
+					var chartCanvas = document.getElementById( bracket + '-poll' ).getContext( "2d" );
+
+					// Draw the chart
+					var newChart = new Chart( chartCanvas ).Bar( data, {
+					    //Boolean - Whether grid lines are shown across the chart
+					    scaleShowGridLines : false,
+
+				        // Boolean - If we should show the scale at all
+					    showScale: false
+
+					});
+				});
+			}
+
+			/*
+				Source: 
+				http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+			*/
+			function shadeColor(color, percent) {   
+				var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+				return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
+			}				
+		</script>
+	{% endif %}
+	<!-- @END thanks.html -->
 {% endblock %}
 
 {% block below_form %}

@@ -24,14 +24,16 @@
 			</div>
 
 			{% if not page.custom_fields.wide_survey and not page.custom_fields.survey_questions_first %}
-				{% include "./user_form_wrapper.html" %}
+				<div class="user-form-wrapper">
+					{% include "./user_form_wrapper.html" %}
+				</div> <!-- .user-form-wrapper -->
 			{% endif %}
 
 
 			<div id="survey-questions" class="survey-questions">
 				{% autoescape off %}
 					{% if page.custom_fields.wide_survey and not page.custom_fields.survey_questions_first %}
-						<div class="row">
+						<div class="row user-form-wrapper">
 							<div class="medium-24 columns">
 								{% include "./user_form_wrapper.html" %}
 							</div>
@@ -54,7 +56,7 @@
 					{% endfor %}
 
 					{% if page.custom_fields.wide_survey and page.custom_fields.survey_questions_first %}
-						<div class="row">
+						<div class="row user-form-wrapper">
 							<div class="medium-24 columns">
 								{% include "./user_form_wrapper.html" %}
 							</div>
@@ -64,7 +66,9 @@
 			</div> <!-- .survey-questions -->
 
 			{% if not page.custom_fields.wide_survey and page.custom_fields.survey_questions_first %}
-				{% include "./user_form_wrapper.html" %}
+				<div class="user-form-wrapper">
+					{% include "./user_form_wrapper.html" %}
+				</div> <!-- .user-form-wrapper -->
 			{% endif %}
 
 			<div class="submit-button">
@@ -82,5 +86,49 @@
 			</div> <!-- .about-text -->
 		{% endif %}
 	</form>
+
+	{% if page.custom_fields.furry_feud %}
+		<script>
+			$( '.animal img' ).click( function(e) {
+				// Read the data attribute "animal" from the element clicked
+				var animal = $( this ).data( 'animal' );
+
+				// Check if the "show-factoid" class is missing (ie is it currently invisible)
+				if( !$( this ).hasClass( 'show-factoid' ) ) {
+					// Remove show-factoid from all animal image elements
+					$( '.animal img' ).removeClass( 'show-factoid' );
+
+					// Fade out any animal elements EXCEPT the one clicked on
+					$(' .fact-popup:not(#factoid-' + animal +') ' ).fadeOut( 300 );
+
+					// Fade in the one clicked on
+					$( '#factoid-' + animal ).fadeIn( 300 );
+
+					// Add the show-factoid class to the image
+					$( this ).addClass( 'show-factoid' );
+				// We found the show-factoid class, so we need to hide this one
+				} else {
+					// Remove the show-factoid class from the image
+					$( this ).removeClass( 'show-factoid' );
+
+					// Fade out this factoid
+					$( '#factoid-' + animal ).fadeOut( 300 );
+				}
+			});
+
+			$( '.factoid-close' ).click( function() {
+				var img = $( this ).parent().parent().children('img');
+
+				// Read the data attribute "animal" from the element clicked
+				var animal = img.data( 'animal' );
+
+				// Remove the show-factoid class from the image
+				img.removeClass( 'show-factoid' );
+
+				// Fade out this factoid
+				$( '#factoid-' + animal ).fadeOut( 300 );
+			});
+		</script>
+	{% endif %}
 <!-- @END survey.html -->
 {% endblock %}
