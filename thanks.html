@@ -55,7 +55,7 @@
 							<div class="medium-12 columns flyers">
 								<h3>Flyers</h3>
 
-								<canvas id="flyers-poll" width="200" height="200"></canvas>
+								<canvas id="flyers-poll" width="200" height="280"></canvas>
 							</div>
 						</div>
 
@@ -63,15 +63,15 @@
 							<div class="medium-12 columns gentle-giants">
 								<h3>Gentle Giants</h3>
 
-								<canvas id="gentle_giants-poll" width="200" height="200"></canvas>
+								<canvas id="gentle-poll" width="200" height="200"></canvas>
 							</div>
 
 							<div class="medium-12 columns swimmers">
 								<h3>Swimmers</h3>
 
-								<canvas id="swimmers-poll" width="200" height="200"></canvas>
+								<canvas id="swimmers-poll" width="200" height="280"></canvas>
 							</div>
-						</div>						
+						</div>
 					{% endif %}
 
 					{% if page.custom_fields.shareprogress %}
@@ -94,6 +94,14 @@
 					</div>
 				{% else %}
 					<div class="medium-10 columns taf-buttons">
+						{% if page.custom_fields.furry_feud %}
+							<div class="row">
+								<div class="large-24 columns">
+									<p>Share the Feud with your friends using the share tools, below, or just copy and paste this URL: <a href="http://act.alaskawild.org/cms/thanks/fuzzyfeud?u={{ page.canonical_url }}?data={{ user.id }}-personal" title="Fuzzy Feud Thanks">http://act.alaskawild.org/cms/thanks/fuzzyfeud?u={{ page.canonical_url }}?data={{ user.id }}-personal</a></p>
+								</div>
+							</div>
+						{% endif %}
+
 						<div class="ak-sharebox">
 							<div class="row">
 								<div class="large-3 columns taf-icon">
@@ -359,102 +367,77 @@ Subject: {{ page.title }}
 		<script src="https://s3.amazonaws.com/s3.alaskawild.org/foundation/js/Chart.min.js"></script>
 
 		<script>
-			// Hold our external requests
-			var requests = [];
-
 			// Turn machine names into nice names
 			var animals = {
 				polar_bear: "Polar Bear",
 				gray_wolf: "Gray Wolf",
 				arctic_fox: "Arctic Fox",
 
-				snowy_owl: "Snowy Owl",
-				arctic_tern: "Arctic Tern",
-				bald_eagle: "Bald Eagle",
+				owl: "Snowy Owl",
+				tern: "Arctic Tern",
+				eagle: "Bald Eagle",
 
 				caribou: "Caribou",
 				moose: "Moose",
-				muskox: "Muskox",
+				ox: "Muskox",
 
 				walrus: "Walrus",
-				beluga_whale: "Beluga Whale",
-				ringed_seal: "Ringed Seal"
+				beluga: "Beluga Whale",
+				seal: "Ringed Seal"
 			};
-/*
-			var colors = {
-				polar_bear: '#f57b20',  
-				gray_wolf: '#815343',
-				arctic_fox: '#2893ac',
 
-				snowy_owl: '#f57b20',
-				arctic_tern: '#815343',
-				bald_eagle: '#2893ac',
-
-				caribou: '#f57b20',
-				moose: '#815343',
-				muskox: '#2893ac',
-
-				walrus: '#f57b20',
-				beluga_whale: '#815343', 
-				ringed_seal: '#2893ac'		
-			};
-*/
 			var colors = {
 				hunters: '#f57b20',
-				flyers: '#f57b20',  
-				gentle_giants: '#815343',
+				flyers: '#472E74',  
+				gentle: '#815343',
 				swimmers: '#2893ac'
 			}
 
-			// Hold our poll data
-			var data = {
-				labels: [],
-				datasets: []
-			};
-
 			$( document ).ready( function() {
 				drawPoll( 'hunters' );
+				drawPoll( 'swimmers' );
+				drawPoll( 'gentle' );
+				drawPoll( 'flyers' );
 			});
 
 			function drawPoll( bracket ) {
 				// Hold the total number of values
 				var total;
 
-				// Push onto our requests array so we can execute these requests later
-				requests.push(
-					$.getJSON( 'http://www.alaskawild.org/furry-feud/' + bracket + '.php', function( response ) {
-						var dataset = { 
-							label: 'Votes', 
-							data: [],
-							fillColor: colors[ bracket ],
-							strokeColor: shadeColor( colors[ bracket ], 0.25),
-							highlightFill: shadeColor( colors[ bracket ], 0.25),
-							highlightStroke: shadeColor( colors[ bracket ], 0.25) 
-						};
+				// Hold our poll data
+				var data = {
+					labels: [],
+					datasets: []
+				};
 
-						$.each( response, function( label, value ) {
-							data.labels.push( animals[ label ] );
-							dataset.data.push( value );
-						});
+				$.getJSON( 'http://www.alaskawild.org/furry-feud/' + bracket + '.php', function( response ) {
+					var dataset = { 
+						label: 'Votes', 
+						data: [],
+						fillColor: colors[ bracket ],
+						strokeColor: shadeColor( colors[ bracket ], 0.25),
+						highlightFill: shadeColor( colors[ bracket ], 0.25),
+						highlightStroke: shadeColor( colors[ bracket ], 0.25) 
+					};
+
+					$.each( response, function( label, value ) {
+						data.labels.push( animals[ label ] );
+						dataset.data.push( value );
+					});
 					
-						data.datasets.push( dataset );
-					})
-				);
+					data.datasets.push( dataset );
 
-				// Only do this when all of our requests are done
-				$.when.apply(null, requests).done(function() {
-					// Shortcut for where the poll will go
 					var chartCanvas = document.getElementById( bracket + '-poll' ).getContext( "2d" );
 
 					// Draw the chart
 					var newChart = new Chart( chartCanvas ).Bar( data, {
-					    //Boolean - Whether grid lines are shown across the chart
-					    scaleShowGridLines : false,
+						//Boolean - Whether grid lines are shown across the chart
+						scaleShowGridLines : false,
 
-				        // Boolean - If we should show the scale at all
-					    showScale: false
-
+						// Boolean - If we should show the scale at all
+						showScale: true
 					});
+
 				});
 			}
 

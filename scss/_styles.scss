@@ -50,6 +50,7 @@ $offBrown: #BBB2B5;
 $errorColor: #BB0011;
 $white: #ffffff;
 $black: #000000;
+$purple: #472E74;
 
 // Social Media color
 $fbColor: #3b5998;
@@ -1916,6 +1917,18 @@ ul#ak-errors {
 	}
 
 	.flyers {
+		h3 {
+			color: $purple;
+		}
+	}
+
+	.gentle-giants {
+		h3 {
+			color: $brown;
+		}
+	}
+
+	.swimmers {
 		h3 {
 			color: $teal;
 		}
