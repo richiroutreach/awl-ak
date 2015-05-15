@@ -1937,6 +1937,9 @@ ul#ak-errors {
 
 .notifcation {
 	font-style: italic;
-	font-size: 10px;
 	text-align: center;
+
+	p {
+		font-size: 10px;
+	}
 }
