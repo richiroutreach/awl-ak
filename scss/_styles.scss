@@ -1777,7 +1777,7 @@ ul#ak-errors {
 	.photo-credit {
 		position: absolute;
 		bottom: 43px;
-		font-size: 0.75rem;
+		font-size: 0.7rem;
 		color: $orange;
 		text-align: left;
 		line-height: 1.1;
@@ -1933,4 +1933,10 @@ ul#ak-errors {
 			color: $teal;
 		}
 	}
+}
+
+.notifcation {
+	font-style: italic;
+	font-size: 10px;
+	text-align: center;
 }
