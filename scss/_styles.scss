@@ -37,7 +37,8 @@
 
 $font: 'Oxygen', helvetica, sans-serif;
 //$font: 'MuseoSans', 'sans-serif';	
-$dancingScript: 'Dancing Script', 'cursive';
+$dancingScript: $font;
+//$dancingScript: 'Dancing Script', 'cursive';
 $openSansCon: 'Open Sans Condensed', sans-serif;
 $openSansCon: $font;
 
