@@ -21,19 +21,31 @@
 
 	<script>startTime=new Date()</script>
 
-	{% if page.custom_fields.fb_share_text %}
-			<meta name="description" property="og:description" content="{{ page.custom_fields.fb_share_text }}">		
-	{% else %}
-		{% if form.id %}
-			<meta name="description" property="og:description" content="{% block description %}{{ page.custom_fields.description|default:form.intro|striptags }}{% endblock %}">
-		{% endif %}
-	{% endif %}
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+	@START - Facebook Meta Data	
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
 
-	<meta property="og:url" content="{{ page.canonical_url }}">
+	<!-- AK Sharing -->
+	{{ page.followup.share_title_tag }}
 
-	{% if page.custom_fields.fb_share_image %}
-		<meta property="og:image" content="{{ page.custom_fields.fb_share_image}}">
-	{% endif %}
+	{% if form.id %}<meta name="description" property="og:description" content="{% block description %}{{ page.followup.share_description_value }}{% endblock %}">{% endif %}
+
+	{{ page.followup.share_image_tag }}
+
+	{{ page.followup.share_url_tag }}
+	<!-- AK Sharing -->
+
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+	@END - Facebook Meta Data	
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
 
 	{% block meta_additions %}{% endblock %}
 
